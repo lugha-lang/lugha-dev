@@ -1,0 +1,3 @@
+variant 0, Dot()
+variant 1, Square(3)
+variant 2, Label("door", 2)

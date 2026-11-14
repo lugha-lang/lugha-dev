@@ -1,0 +1,33 @@
+interface Parse {
+    fun parse(s: string): Result<Self, string>;
+}
+
+derive Parse for i64 {
+    fun parse(s: string): Result<i64, string> = parse_i64(s).ok_or("`{s}` isn't a number");
+}
+
+derive Parse for string {
+    fun parse(s: string): Result<string, string> = Ok(s);
+}
+
+fun field<F: Parse>(parts: string[], name: string, at: i64, count: i64): Result<F, string> {
+    if parts.len != count {
+        return Err("expected {count} parts, got {parts.len}");
+    }
+    return F.parse(parts[at]);
+}
+
+derive Parse for struct {
+    fun parse(s: string): Result<Self, string> = derive.build(s.split(","), field);
+}
+
+struct Book { title: string, pages: i64 }
+
+fun read<T: Parse>(s: string): Result<T, string> = T.parse(s);
+
+fun main() {
+    for line of ["Dune,412", "Dune,many", "Dune"] {
+        let book: Result<Book, string> = read(line);
+        println(book);
+    }
+}
