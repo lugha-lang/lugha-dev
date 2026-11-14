@@ -1,0 +1,2 @@
+45 and 45, close: true
+45 and 48, close: false

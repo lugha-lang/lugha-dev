@@ -1,0 +1,3 @@
+Ok(Book { title: "Dune", pages: 412 })
+Err("`many` isn't a number")
+Err("expected 2 parts, got 1")
