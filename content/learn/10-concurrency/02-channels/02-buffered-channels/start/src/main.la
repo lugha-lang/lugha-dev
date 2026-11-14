@@ -1,0 +1,16 @@
+fun produce(c: Chan<i64>) {
+    for i of range(1, 4) {
+        c.send(i);
+        println("sent {i}");
+    }
+}
+
+fun main() {
+    let c: Chan<i64> = Chan.buffered(3);
+    let t = spawn produce(c);
+    t.join();
+    println(c.try_recv());
+    println(c.try_recv());
+    println(c.try_recv());
+    println(c.try_recv());
+}

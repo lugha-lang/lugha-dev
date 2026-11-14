@@ -1,0 +1,16 @@
+actor Counter {
+    count: i64,
+
+    fun add(mut self, n: i64) {
+        self.count += n;
+    }
+
+    fun get(self): i64 = self.count;
+}
+
+fun main() {
+    let c = spawn Counter { count: 0 };
+    c.add(2);
+    c.add(3);
+    println(c.get());
+}

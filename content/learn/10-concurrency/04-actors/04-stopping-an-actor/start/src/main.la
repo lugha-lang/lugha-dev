@@ -1,0 +1,19 @@
+actor Divider {
+    by: i64,
+
+    fun show(self, n: i64) {
+        println(n / self.by);
+    }
+}
+
+fun main() {
+    let a = spawn Divider { by: 2 };
+    a.show(10);
+    a.stop();
+    println(a.join());
+
+    let b = spawn Divider { by: 0 };
+    b.show(10);
+    println(b.join());
+    println("main still runs");
+}
