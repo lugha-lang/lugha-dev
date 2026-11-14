@@ -1,0 +1,17 @@
+fun produce(c: Chan<i64>) {
+    for i of range(1, 4) {
+        c.send(i);
+    }
+    c.close();
+}
+
+fun main() {
+    let c: Chan<i64> = Chan.new();
+    let t = spawn produce(c);
+    while let Some(v) = c.recv() {
+        println("got {v}");
+    }
+    println("closed");
+    println(c.recv());
+    t.join();
+}

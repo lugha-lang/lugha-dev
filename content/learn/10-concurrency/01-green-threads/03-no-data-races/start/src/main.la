@@ -1,0 +1,17 @@
+import std.task;
+
+fun add(total: Ref<i64>, n: i64) {
+    for i of range(0, n) {
+        total.update(fun(x: i64): i64 { x + 1 });
+        task.yield_now();
+    }
+}
+
+fun main() {
+    let total = Ref.new(0);
+    let a = spawn add(total, 1000);
+    let b = spawn add(total, 1000);
+    a.join();
+    b.join();
+    println(total.get());
+}

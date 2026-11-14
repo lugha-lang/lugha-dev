@@ -1,0 +1,4 @@
+queued 1
+full, dropped 2
+full, dropped 3
+Some(1)

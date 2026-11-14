@@ -1,0 +1,4 @@
+main goes on
+log: first
+log: second
+2

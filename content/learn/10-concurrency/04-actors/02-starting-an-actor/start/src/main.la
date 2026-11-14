@@ -1,0 +1,18 @@
+actor Counter {
+    count: i64,
+
+    fun new(start: i64): Self = Self { count: start };
+
+    fun add(mut self, n: i64) {
+        self.count += n;
+    }
+
+    fun get(self): i64 = self.count;
+}
+
+fun main() {
+    let c = Counter.new(10);
+    let d = c;
+    d.add(5);
+    println(c.get());
+}
