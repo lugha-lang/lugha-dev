@@ -13,12 +13,12 @@ enum Job {
     Run(RunRequest),
     Test(Checked),
     Format(Checked),
-}
+} with Eq
 
 /** Turns a list of files into JSON. */
 fun files_value(list: File[]): json.Value = json.Value.Array(
     list.map(
-        fun(f: File) = json.Value.Object(#{
+        fun(f: File) = json.Value.Object(Map {
             "path": json.Value.Text(f.path),
             "text": json.Value.Text(f.text),
         }),
@@ -31,7 +31,7 @@ fun written(fields: Map<string, json.Value>): string = json.stringify(
 ).unwrap();
 
 /** Writes the job for a checked Run request. */
-fun run_job(r: RunRequest): string = written(#{
+fun run_job(r: RunRequest): string = written(Map {
     "v": json.Value.Integer(1),
     "kind": json.Value.Text("run"),
     "files": files_value(r.files),
@@ -42,7 +42,7 @@ fun run_job(r: RunRequest): string = written(#{
 });
 
 /** Writes the job for checked Test (`kind` `"test"`) or Format (`"format"`) files. */
-fun files_job(kind: string, c: Checked): string = written(#{
+fun files_job(kind: string, c: Checked): string = written(Map {
     "v": json.Value.Integer(1),
     "kind": json.Value.Text(kind),
     "files": files_value(c.files),

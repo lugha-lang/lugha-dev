@@ -3,8 +3,9 @@
 # 1. check: the site's unit tests and types (the content checks and the
 #    hostile suite need gVisor and run before merging, on a developer's machine).
 # 2. images: the sandbox, the API and the site, pushed to GHCR. lughac's slow
-#    build is cached in the registry, so it only runs again when LUGHAC_REF or
-#    services/api/Dockerfile changes.
+#    builds (two: LUGHAC_REF for visitors' code, API_LUGHAC_REF for the API and
+#    its runner) are cached in the registry, so each runs again only
+#    when its ref or services/api/Dockerfile changes.
 # 3. deploy: runs deploy/update.sh on the droplet over SSH, with a key that can
 #    run nothing else.
 #
@@ -27,6 +28,7 @@ concurrency:
 
 env:
   LUGHAC_REF: m159
+  API_LUGHAC_REF: m238
   REGISTRY: ghcr.io/lugha-lang/
 
 jobs:
@@ -66,20 +68,24 @@ jobs:
         with:
           context: services/api
           target: sandbox
-          build-args: LUGHAC_REF=${{ env.LUGHAC_REF }}
+          build-args: |
+            LUGHAC_REF=${{ env.LUGHAC_REF }}
+            API_LUGHAC_REF=${{ env.API_LUGHAC_REF }}
           tags: ${{ env.REGISTRY }}lugha-sandbox:${{ env.LUGHAC_REF }}
           push: true
           labels: org.opencontainers.image.source=https://github.com/${{ github.repository }}
           cache-from: type=registry,ref=${{ env.REGISTRY }}lugha-cache:sandbox
           cache-to: type=registry,ref=${{ env.REGISTRY }}lugha-cache:sandbox,mode=max
 
-      # Shares the lughac stage with the sandbox, so lughac is built once.
+      # Shares the lughac stages with the sandbox, so each is built once.
       - name: api
         uses: docker/build-push-action@v6
         with:
           context: services/api
           target: api
-          build-args: LUGHAC_REF=${{ env.LUGHAC_REF }}
+          build-args: |
+            LUGHAC_REF=${{ env.LUGHAC_REF }}
+            API_LUGHAC_REF=${{ env.API_LUGHAC_REF }}
           tags: |
             ${{ env.REGISTRY }}lugha-api:${{ github.sha }}
             ${{ env.REGISTRY }}lugha-api:main

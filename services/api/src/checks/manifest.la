@@ -14,7 +14,7 @@ const DEFAULT: string = "[package]\nname = \"playground\"\nversion = \"0.1.0\"\n
 struct Manifest {
     name: string,
     version: string,
-}
+} with Eq
 
 /** Why a `lugha.toml` was refused. */
 enum ManifestError {
@@ -70,14 +70,14 @@ fun check(text: string): Result<Manifest, ManifestError> {
 
 /** Gives the sentence a visitor sees for a refused `lugha.toml`. */
 fun reason(e: ManifestError): string = match e {
-    Invalid(message) => "lugha.toml isn't valid TOML: {message}",
-    NotAllowed(key) => {
+    .Invalid(message) => "lugha.toml isn't valid TOML: {message}",
+    .NotAllowed(key) => {
         let shown = if key == "link" || key == "packages" { "[{key}]" } else { key };
         "lugha.toml can only have a [package] section here; {shown} isn't allowed in the browser."
     }
-    NotAllowedInPackage(key) => "[package] can only have name, version and source here; {key} isn't allowed.",
-    NoPackage => "lugha.toml needs a [package] section with name, version and source.",
-    BadName => "In lugha.toml, name must be the package's name, as text.",
-    BadVersion => "In lugha.toml, version must be text such as \"0.1.0\".",
-    BadSource => "In lugha.toml, source must be \"src\".",
+    .NotAllowedInPackage(key) => "[package] can only have name, version and source here; {key} isn't allowed.",
+    .NoPackage => "lugha.toml needs a [package] section with name, version and source.",
+    .BadName => "In lugha.toml, name must be the package's name, as text.",
+    .BadVersion => "In lugha.toml, version must be text such as \"0.1.0\".",
+    .BadSource => "In lugha.toml, source must be \"src\".",
 };

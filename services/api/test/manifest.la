@@ -3,8 +3,8 @@ import api.checks.manifest { Manifest, check, reason, DEFAULT };
 import std.toml;
 
 fun why(text: string): string = match check(text) {
-    Err(e) => reason(e),
-    Ok(_) => "ok",
+    .Err(e) => reason(e),
+    .Ok(_) => "ok",
 };
 
 @test
@@ -88,7 +88,7 @@ fun each_field_is_required_and_typed() {
 @test
 fun invalid_toml_says_where() {
     assert_eq(why("[package\n"), "lugha.toml isn't valid TOML: " + match toml.parse("[package\n") {
-        Err(e) => e.message(),
-        Ok(_) => "",
+        .Err(e) => e.message(),
+        .Ok(_) => "",
     });
 }

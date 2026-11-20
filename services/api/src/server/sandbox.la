@@ -10,9 +10,7 @@
  * container that outlives it is removed by name.
  */
 import std.json;
-import std.process;
 import std.random;
-import std.time;
 import checks.limits { OUTER_SECONDS, COMPILE_MEMORY_MB };
 import runner.steps { Command };
 import runner.outcome { Captured };
@@ -33,7 +31,7 @@ enum SandboxError {
     NoResult(i64),
     /** The runner reported its own trouble. */
     RunnerFailed(string),
-}
+} with Eq
 
 /** Builds the `docker run` for one sandbox, running `argv` in `image` under the name `name`. */
 fun docker_command(image: string, name: string, argv: string[]): Command {
@@ -99,35 +97,47 @@ fun read_result(c: Captured): Result<json.Value, SandboxError> {
     if json.get(result, "v").and_then(json.as_i64) != Some(1) {
         return Err(SandboxError.NoResult(c.code));
     }
-    if let Some(why) = json.get(result, "failure").and_then(json.as_text) {
+    if let .Some(why) = json.get(result, "failure").and_then(json.as_text) {
         return Err(SandboxError.RunnerFailed(why));
     }
     Ok(result)
 }
 
-/** Makes a container name no other sandbox has. */
-fun fresh_name(): string {
-    let mut rng = random.from_os();
-    "lugha-sandbox-{time.now_ms()}-{rng.below(1000000000)}"
+/** Makes a container name no other sandbox has, from the time and fresh randomness. */
+fun fresh_name(clock: Clock, entropy: Entropy): string {
+    let mut rng = random.from_entropy(entropy);
+    "lugha-sandbox-{clock.now_ms()}-{rng.below(1000000000)}"
+}
+
+/** What starting a sandbox needs from the world: other programs, the clock and randomness. */
+struct Host {
+    proc: Proc,
+    clock: Clock,
+    entropy: Entropy,
 }
 
 /**
  * Runs `argv` in a fresh sandbox from `image`, with `input` on its stdin, and
- * gives back the runner's result.
+ * gives back the runner's result. `host` starts `docker`.
  *
  * Errors: `Docker` when `timeout` or `docker` can't be started, and every
  * error `read_result` gives.
  */
-fun run_in_sandbox(image: string, argv: string[], input: string): Result<json.Value, SandboxError> {
-    let name = fresh_name();
+fun run_in_sandbox(
+    host: Host,
+    image: string,
+    argv: string[],
+    input: string,
+): Result<json.Value, SandboxError> {
+    let name = fresh_name(host.clock, host.entropy);
     let c = docker_command(image, name, argv);
-    let out = process.run_with(c.cmd, c.args, input).map_err(SandboxError.Docker)?;
+    let out = host.proc.run_with(c.cmd, c.args, input).map_err(SandboxError.Docker)?;
     let captured = Captured { code: out.code as i64, stdout: out.stdout, stderr: out.stderr };
     let result = read_result(captured);
-    if let Err(TimedOut) = result {
+    if let .Err(.TimedOut) = result {
         // Stopping `docker run` doesn't always stop its container: remove it.
         // Failing here is harmless: the clean-up job removes it later.
-        let _ = process.run("docker", ["rm", "--force", name]);
+        let _ = host.proc.run("docker", ["rm", "--force", name]);
     }
     result
 }

@@ -5,13 +5,11 @@
  * the limits (`runner.steps`), and prints one JSON result on stdout
  * (`runner.outcome`). Everything untrusted happens here, inside gVisor.
  *
- * Usage: `runner [WORK_FOLDER]` (default `/work`, the container's scratch).
+ * Usage: `runner` (it works in the folder it starts in: the container
+ * starts it in `/work`, its scratch) or `runner --version`.
  *
  * Wiring only: what's worth testing lives in the package's modules.
  */
-import std.fs;
-import std.env;
-import std.process;
 import std.json;
 import api.checks.files { File };
 import api.checks.job { Job, decode };
@@ -19,13 +17,19 @@ import api.checks.requests { RunRequest };
 import api.runner.steps { Command, build_command, run_command, test_command, format_command };
 import api.runner.outcome { Captured, run_result, test_result, format_result, failure, lughac_ran };
 
+/** What a job needs from the world: the work folder and other programs. */
+struct World {
+    dir: Dir,
+    proc: Proc,
+}
+
 /**
  * Runs a command with `input` on its stdin and captures what it printed.
  *
  * Errors: a sentence naming the command when it can't be started.
  */
-fun capture(c: Command, input: string): Result<Captured, string> {
-    let out = process.run_with(c.cmd, c.args, input).map_err(
+fun capture(w: World, c: Command, input: string): Result<Captured, string> {
+    let out = w.proc.run_with(c.cmd, c.args, input).map_err(
         fun(e: string) = "couldn't run {c.cmd}: {e}",
     )?;
     Ok(Captured { code: out.code as i64, stdout: out.stdout, stderr: out.stderr })
@@ -42,13 +46,13 @@ fun folder_of(path: string): string {
  *
  * Errors: a sentence naming the folder or file that couldn't be made or written.
  */
-fun write_all(list: File[]): Result<(), string> {
+fun write_all(w: World, list: File[]): Result<(), string> {
     for f of list {
         let folder = folder_of(f.path);
         if folder != "" {
-            fs.make_dirs(folder).map_err(fun(e: string) = "couldn't make {folder}: {e}")?;
+            w.dir.make_dirs(folder).map_err(fun(e: string) = "couldn't make {folder}: {e}")?;
         }
-        write_file(f.path, f.text).map_err(fun(e: string) = "couldn't write {f.path}: {e}")?;
+        w.dir.write_file(f.path, f.text).map_err(fun(e: string) = "couldn't write {f.path}: {e}")?;
     }
     Ok(())
 }
@@ -60,14 +64,14 @@ fun write_all(list: File[]): Result<(), string> {
  * Errors: a sentence when a file can't be written, a command can't be
  * started, or `lughac` couldn't finish.
  */
-fun do_run(r: RunRequest): Result<string, string> {
-    write_all(r.files)?;
-    fs.make_dirs(".build").map_err(fun(e: string) = "couldn't make .build: {e}")?;
-    let build = lughac_ran(capture(build_command(r.entry, r.opt), "")?)?;
+fun do_run(w: World, r: RunRequest): Result<string, string> {
+    write_all(w, r.files)?;
+    w.dir.make_dirs(".build").map_err(fun(e: string) = "couldn't make .build: {e}")?;
+    let build = lughac_ran(capture(w, build_command(r.entry, r.opt), "")?)?;
     if build.code != 0 {
         return Ok(run_result(build, None));
     }
-    let program = capture(run_command(r.args), r.stdin)?;
+    let program = capture(w, run_command(r.args), r.stdin)?;
     Ok(run_result(build, Some(program)))
 }
 
@@ -77,9 +81,9 @@ fun do_run(r: RunRequest): Result<string, string> {
  * Errors: a sentence when a file can't be written, `lughac` can't be started,
  * or it couldn't finish.
  */
-fun do_test(list: File[]): Result<string, string> {
-    write_all(list)?;
-    Ok(test_result(lughac_ran(capture(test_command(), "")?)?))
+fun do_test(w: World, list: File[]): Result<string, string> {
+    write_all(w, list)?;
+    Ok(test_result(lughac_ran(capture(w, test_command(), "")?)?))
 }
 
 /**
@@ -89,33 +93,33 @@ fun do_test(list: File[]): Result<string, string> {
  * Errors: a sentence when a file can't be written or read back, `lughac`
  * can't be started, or it couldn't finish.
  */
-fun do_format(list: File[]): Result<string, string> {
-    write_all(list)?;
+fun do_format(w: World, list: File[]): Result<string, string> {
+    write_all(w, list)?;
     let sources = list.filter(fun(f: File) = f.path.ends_with(".la"));
-    let done = lughac_ran(capture(format_command(sources.map(fun(f: File) = f.path)), "")?)?;
+    let done = lughac_ran(capture(w, format_command(sources.map(fun(f: File) = f.path)), "")?)?;
     let mut after: File[] = [];
     for f of sources {
-        let text = read_file(f.path).map_err(fun(e: string) = "couldn't read {f.path} back: {e}")?;
+        let text = w.dir.read_file(f.path).map_err(
+            fun(e: string) = "couldn't read {f.path} back: {e}",
+        )?;
         after.push(File { path: f.path, text: text });
     }
     Ok(format_result(done, sources, after))
 }
 
 /**
- * Does the job on stdin, in `work`, and gives back its result.
+ * Does the job read from `input`, in the work folder, and gives back its result.
  *
- * Errors: a sentence when `work` can't be entered, the job isn't UTF-8 or
- * fails its checks, or doing it fails.
+ * Errors: a sentence when the job can't be read, isn't UTF-8 or fails its
+ * checks, or doing it fails.
  */
-fun serve(work: string): Result<string, string> {
-    env.set_current_dir(work).map_err(fun(e: string) = "couldn't enter {work}: {e}")?;
-    let text = string_from_utf8(read_stdin_bytes()).map_err(
-        fun(e: string) = "the job isn't UTF-8: {e}",
-    )?;
+fun serve(w: World, input: Console): Result<string, string> {
+    let bytes = input.read_bytes().map_err(fun(e: string) = "couldn't read the job: {e}")?;
+    let text = string_from_utf8(bytes).map_err(fun(e: string) = "the job isn't UTF-8: {e}")?;
     match decode(text)? {
-        Run(r) => do_run(r),
-        Test(c) => do_test(c.files),
-        Format(c) => do_format(c.files),
+        .Run(r) => do_run(w, r),
+        .Test(c) => do_test(w, c.files),
+        .Format(c) => do_format(w, c.files),
     }
 }
 
@@ -125,12 +129,12 @@ fun serve(work: string): Result<string, string> {
  *
  * Errors: a sentence when `lughac` can't be started.
  */
-fun lughac_version(): Result<string, string> {
-    let out = process.run("lughac", ["--version"]).map_err(
+fun lughac_version(proc: Proc): Result<string, string> {
+    let out = proc.run("lughac", ["--version"]).map_err(
         fun(e: string) = "couldn't run lughac: {e}",
     )?;
     Ok(
-        written(#{
+        written(Map {
             "v": json.Value.Integer(1),
             "kind": json.Value.Text("version"),
             "lughac": json.Value.Text(out.stdout.trim()),
@@ -138,14 +142,16 @@ fun lughac_version(): Result<string, string> {
     )
 }
 
-fun main() {
-    let argv = args();
-    let arg = if argv.len > 1 { argv[1] } else { "/work" };
+fun main(args: string[], console: Console, fs: Fs, proc: Proc) {
     // Always exactly one JSON object on stdout, so the API can always decode it.
-    let done = if arg == "--version" { lughac_version() } else { serve(arg) };
+    let done = if args.len > 1 && args[1] == "--version" {
+        lughac_version(proc)
+    } else {
+        serve(World { dir: fs.cwd(), proc: proc }, console)
+    };
     match done {
-        Ok(result) => println(result),
-        Err(why) => println(failure(why)),
+        .Ok(result) => console.println(result),
+        .Err(why) => console.println(failure(why)),
     }
 }
 

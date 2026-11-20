@@ -1,33 +1,46 @@
 # The API's two images, built from services/api:
 #
-#   target sandbox: what every sandbox container runs. A pinned lughac, the C
-#     compiler lughac links with, the runner, and a warm, read-only cache.
+#   target sandbox: what every sandbox container runs. The lughac visitors'
+#     code is compiled with, the C compiler it links with, the runner, and a
+#     warm, read-only cache.
 #   target api: the API server, with the Docker command line it starts
 #     sandboxes with.
 #
-# Both share the lughac stage, so lughac is built once. docker compose builds
-# them (docker compose --profile sandbox build); change LUGHAC_REF to move to
-# another lughac, and the sandbox image's tag follows it.
+# Two lughacs, each built once: LUGHAC_REF is the one visitors'
+# code meets, and the sandbox image's tag follows it; API_LUGHAC_REF is the
+# one the API and the runner are written for and built with. docker compose
+# builds them (docker compose --profile sandbox build).
 
 ARG UBUNTU=ubuntu:26.04
 
-# ---- lughac, from source at a pinned tag -------------------------------
-FROM ${UBUNTU} AS lughac
-ARG LUGHAC_REPO=https://github.com/lugha-lang/lugha.git
-ARG LUGHAC_REF=m159
+# ---- what building lughac needs ------------------------------------------
+FROM ${UBUNTU} AS toolchain
 RUN apt-get update \
  && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
       ca-certificates curl git build-essential llvm-21-dev libssl-dev pkg-config \
  && rm -rf /var/lib/apt/lists/*
-# rustup reads the toolchain the repository pins (rust-toolchain.toml).
+# rustup reads the toolchain each repository pins (rust-toolchain.toml).
 ENV RUSTUP_HOME=/opt/rustup CARGO_HOME=/opt/cargo PATH=/opt/cargo/bin:$PATH
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain none
+
+# ---- the lughac visitors' code is compiled with, at a pinned tag ---------
+FROM toolchain AS lughac
+ARG LUGHAC_REPO=https://github.com/lugha-lang/lugha.git
+ARG LUGHAC_REF=m159
 RUN git clone --depth 1 --branch "${LUGHAC_REF}" "${LUGHAC_REPO}" /src/lugha
 WORKDIR /src/lugha
 RUN cargo build --release --locked && cp target/release/lughac /usr/local/bin/lughac
 
-# ---- the API's own programs, built with that lughac ---------------------
-FROM lughac AS programs
+# ---- the lughac the API and the runner are built with --------------------
+FROM toolchain AS api-lughac
+ARG LUGHAC_REPO=https://github.com/lugha-lang/lugha.git
+ARG API_LUGHAC_REF=m238
+RUN git clone --depth 1 --branch "${API_LUGHAC_REF}" "${LUGHAC_REPO}" /src/lugha
+WORKDIR /src/lugha
+RUN cargo build --release --locked && cp target/release/lughac /usr/local/bin/lughac
+
+# ---- the API's own programs, built with the API's lughac -----------------
+FROM api-lughac AS programs
 WORKDIR /src/api
 COPY lugha.toml ./
 COPY src ./src

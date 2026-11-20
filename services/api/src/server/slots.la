@@ -1,0 +1,30 @@
+/**
+ * Lets at most a few sandboxes run at once. Every connection is its
+ * own task, so the limit is shared through a channel holding one token per
+ * free slot: a job takes a token before its sandbox starts, waiting while
+ * there is none, and puts it back when the sandbox is done, however it ended.
+ */
+
+/** The two ends of the token channel. */
+struct Slots {
+    /** Where a job takes its token from. */
+    taken: Receiver<()>,
+    /** Where it puts the token back. */
+    given: Sender<()>,
+}
+
+/** Makes `n` free slots. */
+fun free_slots(n: i64): Slots {
+    let (given, taken) = Chan<()>.new(n);
+    for _ in 0..n {
+        given.send(());
+    }
+    Slots { taken: taken, given: given }
+}
+
+/** Runs `f` once a slot is free, and frees the slot again when `f` is done. */
+fun in_slot<T>(s: Slots, f: fun(): T): T {
+    let _ = s.taken.recv();
+    defer s.given.send(());
+    f()
+}

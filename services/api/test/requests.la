@@ -2,13 +2,13 @@
 import api.checks.requests { RunRequest, run_request, files_request, reason };
 
 fun why_run(body: string): string = match run_request(body) {
-    Err(e) => reason(e),
-    Ok(_) => "ok",
+    .Err(e) => reason(e),
+    .Ok(_) => "ok",
 };
 
 fun why_files(body: string): string = match files_request(body) {
-    Err(e) => reason(e),
-    Ok(_) => "ok",
+    .Err(e) => reason(e),
+    .Ok(_) => "ok",
 };
 
 const MAIN: string = "{{\"path\": \"src/main.la\", \"text\": \"fun main() {{}}\"}}";

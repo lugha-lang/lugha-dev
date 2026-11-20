@@ -10,37 +10,57 @@
 // Home's card (content/home) and the Playground's opening program
 // (content/playground) are checked the same way.
 //
-// Runs only when asked, like the hostile suite:
+// Integration tests: they start Docker and read the content folder, so they
+// run only when asked, like the hostile suite:
 //   scripts/content
 // CONTENT_DIR names the content folder (default ../../content, from services/api).
-import std.env;
-import std.fs;
 import std.json;
-import std.process;
 import std.toml;
 import api.checks.files { File };
 import api.checks.manifest { DEFAULT };
 import api.checks.requests { RunRequest, files_request, reason };
 import api.checks.job { run_job, files_job, files_value };
-import api.server.sandbox { run_in_sandbox };
+import api.server.sandbox { Host, run_in_sandbox };
 
-fun image(): string = env.get("SANDBOX_IMAGE").unwrap_or("lugha-sandbox:m159");
+/** The runner's path inside the sandbox image. */
+const RUNNER: string = "/usr/local/bin/runner";
 
-fun root(): string = env.get("CONTENT_DIR").unwrap_or("../../content");
+/** What the checks use: the sandbox image, how to start it, and the content folder, read-only. */
+struct Setup {
+    host: Host,
+    image: string,
+    content: ReadDir,
+}
 
-/** Whether the checks were asked for, Docker has runsc and the sandbox image is built. */
-fun ready(): bool {
+/**
+ * `net` is never called: holding it keeps v18's lockdown from refusing the
+ * socket `docker` talks to its daemon through.
+ *
+ * Gives the setup when the checks were asked for (SANDBOX_TESTS=1), Docker
+ * has runsc, the sandbox image is built and the content folder opens.
+ */
+fun setup(env: Env, fs: Fs, proc: Proc, net: Net, clock: Clock, entropy: Entropy): Option<Setup> {
     if env.get("SANDBOX_TESTS") != Some("1") {
-        return false;
+        return None;
     }
-    let has_runsc = match process.run("docker", ["info", "--format", "{{{{json .Runtimes}}}}"]) {
-        Ok(out) => out.stdout.contains("\"runsc\""),
-        Err(_) => false,
+    let image = env.get("SANDBOX_IMAGE").unwrap_or("lugha-sandbox:m159");
+    let has_runsc = match proc.run("docker", ["info", "--format", "{{{{json .Runtimes}}}}"]) {
+        .Ok(out) => out.stdout.contains("\"runsc\""),
+        .Err(_) => false,
     };
-    has_runsc && match process.run("docker", ["image", "inspect", image()]) {
-        Ok(out) => out.code == 0,
-        Err(_) => false,
+    let has_image = match proc.run("docker", ["image", "inspect", image]) {
+        .Ok(out) => out.code == 0,
+        .Err(_) => false,
+    };
+    if !has_runsc || !has_image {
+        return None;
     }
+    let content = fs.dir(env.get("CONTENT_DIR").unwrap_or("../../content")).ok()?;
+    Some(Setup {
+        host: Host { proc: proc, clock: clock, entropy: entropy },
+        image: image,
+        content: content.read_only(),
+    })
 }
 
 /** What one run gave: its compile error code (or ""), and its stdout. */
@@ -50,27 +70,20 @@ struct Ran {
 }
 
 /** Runs `source` as src/main.la with `stdin`, as the API would. */
-fun run(source: string, stdin: string): Result<Ran, string> = run_files(
+fun run(s: Setup, source: string, stdin: string): Result<Ran, string> = run_files(
+    s,
     [File { path: "src/main.la", text: source }],
     stdin,
 );
 
 /** Runs a project's files, with src/main.la as the entry, and the default lugha.toml unless it has its own. */
-fun run_files(project: File[], stdin: string): Result<Ran, string> {
+fun run_files(s: Setup, project: File[], stdin: string): Result<Ran, string> {
     let mut all = project;
     if !all.any(fun(f) = f.path == "lugha.toml") {
         all.push(File { path: "lugha.toml", text: DEFAULT });
     }
-    let r = RunRequest {
-        files: all,
-        entry: "src/main.la",
-        args: [],
-        stdin: stdin,
-        opt: 0,
-    };
-    let v = run_in_sandbox(image(), ["/usr/local/bin/runner", "/work"], run_job(r)).map_err(
-        fun(e) = "{e}",
-    )?;
+    let r = RunRequest { files: all, entry: "src/main.la", args: [], stdin: stdin, opt: 0 };
+    let v = run_in_sandbox(s.host, s.image, [RUNNER], run_job(r)).map_err(fun(e) = e.debug())?;
     // A step may show a warning on purpose (W0107 for `017`), so only an
     // error-severity diagnostic counts as the step's error.
     let diagnostics = json.get(v, "compile").and_then(fun(c) = json.get(c, "diagnostics")).and_then(
@@ -97,11 +110,11 @@ struct Tested {
 }
 
 /** Runs a project's tests, as the API's Test would. */
-fun test_files(project: File[]): Result<Tested, string> {
-    let body = json.stringify(json.Value.Object(#{ "files": files_value(project) })).unwrap();
+fun test_files(s: Setup, project: File[]): Result<Tested, string> {
+    let body = json.stringify(json.Value.Object(Map { "files": files_value(project) })).unwrap();
     let c = files_request(body).map_err(reason)?;
-    let v = run_in_sandbox(image(), ["/usr/local/bin/runner", "/work"], files_job("test", c)).map_err(
-        fun(e) = "{e}",
+    let v = run_in_sandbox(s.host, s.image, [RUNNER], files_job("test", c)).map_err(
+        fun(e) = e.debug(),
     )?;
     let mut failed: string[] = [];
     let mut passed = 0;
@@ -130,17 +143,24 @@ fun names(list: string): string[] = list.split(",").map(fun(n) = n.trim()).filte
  * Compares a Test with what was expected: every test passing when `failing`
  * is empty, otherwise exactly those tests failing.
  */
-fun check_tests(problems: string[], what: string, got: Result<Tested, string>, failing: string[]): string[] {
+fun check_tests(
+    problems: string[],
+    what: string,
+    got: Result<Tested, string>,
+    failing: string[],
+): string[] {
     let mut out = problems;
     match got {
-        Err(e) => out.push("{what}: no result ({e})"),
-        Ok(t) => {
+        .Err(e) => out.push("{what}: no result ({e})"),
+        .Ok(t) => {
             if !t.compiled {
                 out.push("{what}: the tests didn't compile");
             } else if failing.len == 0 && (t.failed.len > 0 || t.passed == 0) {
-                out.push("{what}: expected every test to pass; failed {t.failed}, passed {t.passed}");
+                out.push(
+                    "{what}: expected every test to pass; failed {t.failed.debug()}, passed {t.passed}",
+                );
             } else if failing.len > 0 && t.failed != failing {
-                out.push("{what}: expected {failing} to fail, failed {t.failed}");
+                out.push("{what}: expected {failing.debug()} to fail, failed {t.failed.debug()}");
             }
         }
     }
@@ -148,17 +168,20 @@ fun check_tests(problems: string[], what: string, got: Result<Tested, string>, f
 }
 
 /** Every file under `dir`, by its path from `dir` ("src/main.la"). */
-fun project(dir: string): File[] {
+fun project(content: ReadDir, dir: string): File[] {
     let mut out: File[] = [];
     let mut todo = [""];
-    while let Some(rel) = todo.pop() {
+    while let .Some(rel) = todo.pop() {
         let here = if rel == "" { dir } else { "{dir}/{rel}" };
-        for name of fs.list_dir(here).unwrap_or([]) {
+        for name of content.list(here).unwrap_or([]) {
             let child = if rel == "" { name } else { "{rel}/{name}" };
-            if fs.is_dir("{dir}/{child}") {
+            if content.is_dir("{dir}/{child}") {
                 todo.push(child);
             } else {
-                out.push(File { path: child, text: read_file("{dir}/{child}").unwrap_or("") });
+                out.push(File {
+                    path: child,
+                    text: content.read_file("{dir}/{child}").unwrap_or(""),
+                });
             }
         }
     }
@@ -166,8 +189,8 @@ fun project(dir: string): File[] {
 }
 
 /** The folders in `path`, sorted (list_dir sorts). */
-fun folders(path: string): string[] = fs.list_dir(path).unwrap_or([]).filter(
-    fun(n) = fs.is_dir("{path}/{n}"),
+fun folders(content: ReadDir, path: string): string[] = content.list(path).unwrap_or([]).filter(
+    fun(n) = content.is_dir("{path}/{n}"),
 );
 
 /**
@@ -206,8 +229,8 @@ fun check(
 ): string[] {
     let mut out = problems;
     match got {
-        Err(e) => out.push("{what}: no result ({e})"),
-        Ok(r) => {
+        .Err(e) => out.push("{what}: no result ({e})"),
+        .Ok(r) => {
             if error != "" && r.error != error {
                 out.push(
                     "{what}: expected {error}, got {if r.error == "" { "no error" } else { r.error }}",
@@ -224,31 +247,40 @@ fun check(
     out
 }
 
-@test
-fun every_lesson_step_prints_what_it_says() {
-    if !ready() {
-        skip("set SANDBOX_TESTS=1, with runsc and the sandbox image");
-    }
+@test(integration)
+fun every_lesson_step_prints_what_it_says(
+    console: Console,
+    env: Env,
+    fs: Fs,
+    proc: Proc,
+    net: Net,
+    clock: Clock,
+    entropy: Entropy,
+) {
+    let s = setup(env, fs, proc, net, clock, entropy).expect(
+        "set SANDBOX_TESTS=1, with runsc, the sandbox image and the content folder",
+    );
+    let c = s.content;
     let mut problems: string[] = [];
     let mut steps = 0;
-    let learn = "{root()}/learn";
-    for chapter of folders(learn) {
-        for lesson of folders("{learn}/{chapter}") {
-            for step of folders("{learn}/{chapter}/{lesson}") {
+    let learn = "learn";
+    for chapter of folders(c, learn) {
+        for lesson of folders(c, "{learn}/{chapter}") {
+            for step of folders(c, "{learn}/{chapter}/{lesson}") {
                 let dir = "{learn}/{chapter}/{lesson}/{step}";
-                let md = read_file("{dir}/step.md").expect("every step has step.md");
-                let expected = read_file("{dir}/expected.txt").expect(
+                let md = c.read_file("{dir}/step.md").expect("every step has step.md");
+                let expected = c.read_file("{dir}/expected.txt").expect(
                     "every step has expected.txt",
                 );
-                let start = project("{dir}/start");
+                let start = project(c, "{dir}/start");
                 let tests = start.any(fun(f) = f.path.starts_with("test/"));
                 steps += 1;
-                if fs.is_dir("{dir}/solution") {
-                    let solution = project("{dir}/solution");
+                if c.is_dir("{dir}/solution") {
+                    let solution = project(c, "{dir}/solution");
                     problems = check(
                         problems,
                         "{step} (solution)",
-                        run_files(solution, ""),
+                        run_files(s, solution, ""),
                         "",
                         expected,
                     );
@@ -256,7 +288,7 @@ fun every_lesson_step_prints_what_it_says() {
                         problems = check_tests(
                             problems,
                             "{step} (solution's tests)",
-                            test_files(solution),
+                            test_files(s, solution),
                             [],
                         );
                     }
@@ -265,22 +297,27 @@ fun every_lesson_step_prints_what_it_says() {
                         problems = check_tests(
                             problems,
                             "{step} (start's tests)",
-                            test_files(start),
+                            test_files(s, start),
                             names(failing),
                         );
                     } else {
                         problems = check(
                             problems,
                             "{step} (start)",
-                            run_files(start, ""),
+                            run_files(s, start, ""),
                             front(md, "start_error"),
                             front(md, "start_output"),
                         );
                     }
                 } else {
-                    problems = check(problems, step, run_files(start, ""), "", expected);
+                    problems = check(problems, step, run_files(s, start, ""), "", expected);
                     if tests {
-                        problems = check_tests(problems, "{step} (tests)", test_files(start), []);
+                        problems = check_tests(
+                            problems,
+                            "{step} (tests)",
+                            test_files(s, start),
+                            [],
+                        );
                     }
                 }
             }
@@ -288,50 +325,68 @@ fun every_lesson_step_prints_what_it_says() {
     }
     assert(steps > 0);
     for p of problems {
-        eprintln(p);
+        console.eprintln(p);
     }
     assert_eq(problems, []);
 }
 
-@test
-fun every_example_prints_what_it_says() {
-    if !ready() {
-        skip("set SANDBOX_TESTS=1, with runsc and the sandbox image");
-    }
+@test(integration)
+fun every_example_prints_what_it_says(
+    console: Console,
+    env: Env,
+    fs: Fs,
+    proc: Proc,
+    net: Net,
+    clock: Clock,
+    entropy: Entropy,
+) {
+    let s = setup(env, fs, proc, net, clock, entropy).expect(
+        "set SANDBOX_TESTS=1, with runsc, the sandbox image and the content folder",
+    );
+    let c = s.content;
     let mut problems: string[] = [];
-    let examples = "{root()}/examples";
-    let names = folders(examples);
+    let examples = "examples";
+    let names = folders(c, examples);
     assert(names.len > 0);
     for name of names {
         let dir = "{examples}/{name}";
         let meta = toml.parse(
-            read_file("{dir}/example.toml").expect("every example has example.toml"),
+            c.read_file("{dir}/example.toml").expect("every example has example.toml"),
         ).expect("example.toml is TOML");
         let stdin = toml.get(meta, "stdin").and_then(toml.as_text).unwrap_or("");
-        let source = read_file("{dir}/src/main.la").expect("every example has src/main.la");
-        let expected = read_file("{dir}/expected.txt").expect("every example has expected.txt");
-        problems = check(problems, name, run(source, stdin), "", expected);
+        let source = c.read_file("{dir}/src/main.la").expect("every example has src/main.la");
+        let expected = c.read_file("{dir}/expected.txt").expect("every example has expected.txt");
+        problems = check(problems, name, run(s, source, stdin), "", expected);
     }
     for p of problems {
-        eprintln(p);
+        console.eprintln(p);
     }
     assert_eq(problems, []);
 }
 
-@test
-fun home_and_playground_programs_print_what_they_say() {
-    if !ready() {
-        skip("set SANDBOX_TESTS=1, with runsc and the sandbox image");
-    }
+@test(integration)
+fun home_and_playground_programs_print_what_they_say(
+    console: Console,
+    env: Env,
+    fs: Fs,
+    proc: Proc,
+    net: Net,
+    clock: Clock,
+    entropy: Entropy,
+) {
+    let s = setup(env, fs, proc, net, clock, entropy).expect(
+        "set SANDBOX_TESTS=1, with runsc, the sandbox image and the content folder",
+    );
+    let c = s.content;
     let mut problems: string[] = [];
     for name of ["home", "playground"] {
-        let dir = "{root()}/{name}";
-        let source = read_file("{dir}/src/main.la").expect("the program is src/main.la");
-        let expected = read_file("{dir}/expected.txt").expect("the program has expected.txt");
-        problems = check(problems, name, run(source, ""), "", expected);
+        let dir = name;
+        let source = c.read_file("{dir}/src/main.la").expect("the program is src/main.la");
+        let expected = c.read_file("{dir}/expected.txt").expect("the program has expected.txt");
+        problems = check(problems, name, run(s, source, ""), "", expected);
     }
     for p of problems {
-        eprintln(p);
+        console.eprintln(p);
     }
     assert_eq(problems, []);
 }
