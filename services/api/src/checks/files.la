@@ -12,13 +12,13 @@ import checks.manifest { Manifest, ManifestError, DEFAULT, check };
 struct File {
     path: string,
     text: string,
-}
+} with Eq
 
 /** A request's files once checked, with `lugha.toml` added when it was missing. */
 struct Checked {
     files: File[],
     manifest: Manifest,
-}
+} with Eq
 
 /** Why a request's files were refused. */
 enum FilesError {
@@ -98,7 +98,7 @@ fun check_files(files: File[]): Result<Checked, FilesError> {
     if files.fold(0, fun(n, file) = n + file.text.len) > MAX_TOTAL_BYTES {
         return Err(FilesError.TooBig);
     }
-    let mut seen: Set<string> = #{};
+    let mut seen: Set<string> = Set {};
     for file of files {
         check_path(file.path)?;
         if !seen.insert(file.path) {
@@ -107,8 +107,8 @@ fun check_files(files: File[]): Result<Checked, FilesError> {
     }
     let mut all = files;
     let toml_text = match files.iter().position(fun(file: File) = file.path == "lugha.toml") {
-        Some(i) => files[i].text,
-        None => {
+        .Some(i) => files[i].text,
+        .None => {
             all.push(File { path: "lugha.toml", text: DEFAULT });
             DEFAULT
         }
@@ -119,10 +119,10 @@ fun check_files(files: File[]): Result<Checked, FilesError> {
 
 /** Gives the sentence a visitor sees for refused files. */
 fun reason(e: FilesError): string = match e {
-    NoFiles => "There's no code to run: add src/main.la.",
-    TooMany => "Too many files: the limit is {MAX_FILES}.",
-    TooBig => "Your code is too big: the limit is {MAX_TOTAL_BYTES / 1024} KB in total.",
-    BadPath(path) => "{path} isn't a file the playground can use: files go in src/ or test/, end in .la, and use letters, digits, _ and -.",
-    Duplicate(path) => "{path} appears twice.",
-    Manifest(m) => manifest.reason(m),
+    .NoFiles => "There's no code to run: add src/main.la.",
+    .TooMany => "Too many files: the limit is {MAX_FILES}.",
+    .TooBig => "Your code is too big: the limit is {MAX_TOTAL_BYTES / 1024} KB in total.",
+    .BadPath(path) => "{path} isn't a file the playground can use: files go in src/ or test/, end in .la, and use letters, digits, _ and -.",
+    .Duplicate(path) => "{path} appears twice.",
+    .Manifest(m) => manifest.reason(m),
 };

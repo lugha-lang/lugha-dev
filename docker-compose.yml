@@ -17,7 +17,8 @@
 #   DOCKER_GID               the group of /var/run/docker.sock (stat -c %g /var/run/docker.sock)
 #   CLOUDFLARE_TUNNEL_TOKEN  the tunnel's token (the tunnel profile only); in
 #                            Cloudflare, the tunnel's public hostname points at http://caddy:80
-#   LUGHAC_REF               the lughac tag to build (default below)
+#   LUGHAC_REF               the lughac visitors' code is compiled with (default below)
+#   API_LUGHAC_REF           the lughac the API and its runner are built with (default below)
 #   REGISTRY, IMAGE_TAG      where the images live and which build (deploy/prod.env
 #                            on the droplet; unset here, so the images are local)
 
@@ -67,6 +68,7 @@ services:
       target: api
       args:
         LUGHAC_REF: ${LUGHAC_REF:-m159}
+        API_LUGHAC_REF: ${API_LUGHAC_REF:-m238}
     image: ${REGISTRY:-}lugha-api:${IMAGE_TAG:-local}
     restart: unless-stopped
     # Reachable only by Caddy on the compose network: no published port.
@@ -113,6 +115,7 @@ services:
       target: sandbox
       args:
         LUGHAC_REF: ${LUGHAC_REF:-m159}
+        API_LUGHAC_REF: ${API_LUGHAC_REF:-m238}
     image: ${REGISTRY:-}lugha-sandbox:${LUGHAC_REF:-m159}
     scale: 0
 

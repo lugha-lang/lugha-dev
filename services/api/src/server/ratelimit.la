@@ -14,7 +14,7 @@ struct Limiter {
 }
 
 /** Gives a limiter with no requests counted. */
-fun empty(): Limiter = Limiter { minute: -1, counts: #{} };
+fun empty(): Limiter = Limiter { minute: -1, counts: Map {} };
 
 /**
  * Counts a request from `ip` at `now_ms` (milliseconds since the epoch), and
@@ -22,7 +22,7 @@ fun empty(): Limiter = Limiter { minute: -1, counts: #{} };
  */
 fun allow(l: Limiter, ip: string, now_ms: i64): (Limiter, bool) {
     let minute = now_ms / 60000;
-    let mut counts: Map<string, i64> = if minute == l.minute { l.counts } else { #{} };
+    let mut counts: Map<string, i64> = if minute == l.minute { l.counts } else { Map {} };
     let n = counts.get(ip).unwrap_or(0);
     if n >= REQUESTS_PER_MINUTE {
         return (Limiter { minute: minute, counts: counts }, false);
@@ -42,4 +42,20 @@ fun allow(l: Limiter, ip: string, now_ms: i64): (Limiter, bool) {
 fun client_ip(connecting: Option<string>): string {
     let ip = connecting.unwrap_or("").trim();
     if ip == "" || ip.contains(",") || ip.contains(" ") { "unknown" } else { ip }
+}
+
+/**
+ * Holds the counts for the whole server. Each connection is its own task, so
+ * the counts live in one actor that handles one request's count at a time:
+ * two requests from one address can never both slip under the limit.
+ */
+actor Counts {
+    limiter: Limiter,
+
+    /** Counts a request from `ip` at `now_ms` and says whether it is allowed. */
+    fun allowed(mut self, ip: string, now_ms: i64): bool {
+        let (next, ok) = allow(self.limiter, ip, now_ms);
+        self.limiter = next;
+        ok
+    }
 }

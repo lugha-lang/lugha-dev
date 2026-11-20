@@ -11,7 +11,7 @@ const FILES_BODY: string = "{{\"files\": [{{\"path\": \"src/main.la\", \"text\":
 fun a_run_job_round_trips() {
     let r = run_request(BODY).unwrap();
     match decode(run_job(r)) {
-        Ok(Run(back)) => assert_eq(back, r),
+        .Ok(.Run(back)) => assert_eq(back, r),
         _ => panic("not a run job"),
     }
 }
@@ -20,11 +20,11 @@ fun a_run_job_round_trips() {
 fun test_and_format_jobs_round_trip() {
     let c = files_request(FILES_BODY).unwrap();
     match decode(files_job("test", c)) {
-        Ok(Test(back)) => assert_eq(back.files, c.files),
+        .Ok(.Test(back)) => assert_eq(back.files, c.files),
         _ => panic("not a test job"),
     }
     match decode(files_job("format", c)) {
-        Ok(Format(back)) => assert_eq(back.files, c.files),
+        .Ok(.Format(back)) => assert_eq(back.files, c.files),
         _ => panic("not a format job"),
     }
 }

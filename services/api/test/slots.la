@@ -1,0 +1,48 @@
+// At most a few sandboxes at once: the token channel behind them.
+import std.task;
+import api.server.slots { Slots, free_slots, in_slot };
+
+/** Holds a slot for `ms`, saying on `out` when it got in (1) and when it left (-1). */
+fun hold(free: Slots, ms: i64, out: Sender<i64>) {
+    in_slot(free, fun() {
+        out.send(1);
+        task.sleep(ms);
+        out.send(-1);
+    });
+}
+
+@test
+fun no_more_than_the_limit_run_at_once() {
+    let (tx, rx) = Chan<i64>.new(12);
+    let r = scope s {
+        let free = free_slots(2);
+        for _ in 0..6 {
+            s.spawn(hold(free, 20, tx));
+        }
+        let mut inside = 0;
+        let mut most = 0;
+        for _ in 0..12 {
+            inside += rx.recv().unwrap();
+            if inside > most {
+                most = inside;
+            }
+        }
+        assert_eq(most, 2);
+        assert_eq(inside, 0);
+    };
+    assert(r.is_ok());
+}
+
+/** Takes a slot and fails inside it. */
+fun fails_inside(free: Slots): Result<i64, string> = in_slot(
+    free,
+    fun(): Result<i64, string> = Err("broke"),
+);
+
+@test
+fun a_failed_job_gives_its_slot_back() {
+    let free = free_slots(1);
+    assert_eq(fails_inside(free), Err("broke"));
+    assert_eq(fails_inside(free), Err("broke"));
+    assert_eq(in_slot(free, fun() = 7), 7);
+}

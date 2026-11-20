@@ -19,7 +19,7 @@ struct RunRequest {
     stdin: string,
     /** `0` or `2`, for `lughac build -O`. */
     opt: i64,
-}
+} with Eq
 
 /** Why a request was refused. */
 enum RequestError {
@@ -102,8 +102,8 @@ fun text_or(
     name: string,
     fallback: string,
 ): Result<string, RequestError> = match fields.get(name) {
-    None => Ok(fallback),
-    Some(v) => json.as_text(v).ok_or(RequestError.WrongType(name, "text")),
+    .None => Ok(fallback),
+    .Some(v) => json.as_text(v).ok_or(RequestError.WrongType(name, "text")),
 };
 
 /**
@@ -113,8 +113,8 @@ fun text_or(
  */
 fun args_of(fields: Map<string, json.Value>): Result<string[], RequestError> {
     let items = match fields.get("args") {
-        None => [],
-        Some(v) => json.as_array(v).ok_or(RequestError.WrongType("args", "a list of text"))?,
+        .None => [],
+        .Some(v) => json.as_array(v).ok_or(RequestError.WrongType("args", "a list of text"))?,
     };
     if items.len > MAX_ARGS {
         return Err(RequestError.TooManyArgs);
@@ -143,10 +143,10 @@ fun args_of(fields: Map<string, json.Value>): Result<string[], RequestError> {
  * Errors: `BadOpt` for anything but the integers 0 and 2.
  */
 fun opt_of(fields: Map<string, json.Value>): Result<i64, RequestError> = match fields.get("opt") {
-    None => Ok(0),
-    Some(v) => match json.as_i64(v) {
-        Some(0) => Ok(0),
-        Some(2) => Ok(2),
+    .None => Ok(0),
+    .Some(v) => match json.as_i64(v) {
+        .Some(0) => Ok(0),
+        .Some(2) => Ok(2),
         _ => Err(RequestError.BadOpt),
     },
 };
@@ -190,18 +190,18 @@ fun files_request(body: string): Result<Checked, RequestError> {
 
 /** Gives the sentence a visitor sees for a refused request. */
 fun reason(e: RequestError): string = match e {
-    NotJson => "The request isn't valid JSON.",
-    NotObject => "The request must be a JSON object.",
-    Unknown(name) => "The request has a field the API doesn't know: {name}.",
-    Missing(name) => "The request is missing {name}.",
-    WrongType(name, want) => "In the request, {name} must be {want}.",
-    BadFile => "In the request, each file must have a path and a text.",
-    Files(f) => files.reason(f),
-    NoSuchEntry(entry) => "{entry} isn't one of your files.",
-    EntryNotSource => "The program must start in a .la file under src/.",
-    TooManyArgs => "Too many arguments: the limit is {MAX_ARGS}.",
-    ArgTooLong => "An argument is too long: the limit is {MAX_ARG_BYTES / 1024} KB each.",
-    ArgHasNul => "An argument can't contain a NUL character.",
-    StdinTooBig => "Standard input is too big: the limit is {MAX_STDIN_BYTES / 1024} KB.",
-    BadOpt => "The optimisation level must be 0 or 2.",
+    .NotJson => "The request isn't valid JSON.",
+    .NotObject => "The request must be a JSON object.",
+    .Unknown(name) => "The request has a field the API doesn't know: {name}.",
+    .Missing(name) => "The request is missing {name}.",
+    .WrongType(name, want) => "In the request, {name} must be {want}.",
+    .BadFile => "In the request, each file must have a path and a text.",
+    .Files(f) => files.reason(f),
+    .NoSuchEntry(entry) => "{entry} isn't one of your files.",
+    .EntryNotSource => "The program must start in a .la file under src/.",
+    .TooManyArgs => "Too many arguments: the limit is {MAX_ARGS}.",
+    .ArgTooLong => "An argument is too long: the limit is {MAX_ARG_BYTES / 1024} KB each.",
+    .ArgHasNul => "An argument can't contain a NUL character.",
+    .StdinTooBig => "Standard input is too big: the limit is {MAX_STDIN_BYTES / 1024} KB.",
+    .BadOpt => "The optimisation level must be 0 or 2.",
 };

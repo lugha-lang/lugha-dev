@@ -19,7 +19,7 @@ failed=0
 passed=0
 
 for name in $(lughac test --list test/content.la | awk '{print $2}'); do
-	if out=$(lughac test --timeout 600 --exact --filter "$name" test/content.la 2>&1); then
+	if out=$(lughac test --integration --timeout 600 --exact --filter "$name" test/content.la 2>&1); then
 		echo "ok      $name"
 		passed=$((passed + 1))
 	else

@@ -43,3 +43,11 @@ const SCRATCH_MB: i64 = 16;
 
 /** Requests one IP address may make in a minute. */
 const REQUESTS_PER_MINUTE: i64 = 20;
+
+/**
+ * Sandboxes running at once. The droplet has one CPU, and a compile
+ * may take up to `COMPILE_SECONDS` against Caddy's 60 s upstream timeout: two
+ * keeps a second visitor from waiting behind a long compile without
+ * stretching both past it.
+ */
+const SANDBOXES: i64 = 2;

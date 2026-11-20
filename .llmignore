@@ -7,8 +7,15 @@
 .env
 .env.*
 
+# ../lugha may be changed from here, by its own CLAUDE.md (owner, 2026-11-20);
+# its protected files stay out of reach
+../lugha/.env
+../lugha/.env.*
+../lugha/Cargo.lock
+../lugha/target/
+../lugha/LICENSE
+
 # Sibling repositories: their own rules apply; read for reference, never write
-../lugha/
 ../rapidkoi/
 ../rapidkoi-rust/
 ../kivuli/

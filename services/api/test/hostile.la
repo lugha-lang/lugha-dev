@@ -9,35 +9,49 @@
 // only when asked, and one at a time (in parallel on a small machine they slow
 // each other past any limit):
 //   scripts/hostile
-import std.env;
 import std.json;
-import std.process;
+import std.task;
 import api.checks.files { File };
 import api.checks.manifest { DEFAULT };
 import api.checks.requests { RunRequest, run_request, reason };
 import api.checks.job { run_job };
-import api.server.sandbox { SandboxError, run_in_sandbox };
+import api.server.sandbox { Host, SandboxError, run_in_sandbox };
 
-fun image(): string = env.get("SANDBOX_IMAGE").unwrap_or("lugha-sandbox:m159");
+/** The runner's path inside the sandbox image. */
+const RUNNER: string = "/usr/local/bin/runner";
 
-/** Whether the suite was asked for, Docker has runsc and the sandbox image is built. */
-fun ready(): bool {
-    if env.get("SANDBOX_TESTS") != Some("1") {
-        return false;
-    }
-    let runtimes = process.run("docker", ["info", "--format", "{{{{json .Runtimes}}}}"]);
-    let has_runsc = match runtimes {
-        Ok(out) => out.stdout.contains("\"runsc\""),
-        Err(_) => false,
+/** What the suite uses: how to start a sandbox, and which image. */
+struct Setup {
+    host: Host,
+    image: string,
+}
+
+/**
+ * `net` is never called: holding it keeps v18's lockdown from refusing the
+ * socket `docker` talks to its daemon through.
+ *
+ * Gives the setup when the suite was asked for (SANDBOX_TESTS=1), Docker has
+ * runsc and the sandbox image is built; panics with what's missing otherwise.
+ */
+fun setup(env: Env, proc: Proc, net: Net, clock: Clock, entropy: Entropy): Setup {
+    let image = env.get("SANDBOX_IMAGE").unwrap_or("lugha-sandbox:m159");
+    let asked = env.get("SANDBOX_TESTS") == Some("1");
+    let has_runsc = match proc.run("docker", ["info", "--format", "{{{{json .Runtimes}}}}"]) {
+        .Ok(out) => out.stdout.contains("\"runsc\""),
+        .Err(_) => false,
     };
-    has_runsc && match process.run("docker", ["image", "inspect", image()]) {
-        Ok(out) => out.code == 0,
-        Err(_) => false,
+    let has_image = match proc.run("docker", ["image", "inspect", image]) {
+        .Ok(out) => out.code == 0,
+        .Err(_) => false,
+    };
+    if !asked || !has_runsc || !has_image {
+        panic("set SANDBOX_TESTS=1, with runsc and the sandbox image");
     }
+    Setup { host: Host { proc: proc, clock: clock, entropy: entropy }, image: image }
 }
 
 /** Runs `source` as src/main.la with `args`, as the API would. */
-fun run(source: string, args: string[]): Result<json.Value, SandboxError> {
+fun run(s: Setup, source: string, args: string[]): Result<json.Value, SandboxError> {
     let r = RunRequest {
         files: [
             File { path: "src/main.la", text: source },
@@ -48,7 +62,7 @@ fun run(source: string, args: string[]): Result<json.Value, SandboxError> {
         stdin: "",
         opt: 0,
     };
-    run_in_sandbox(image(), ["/usr/local/bin/runner", "/work"], run_job(r))
+    run_in_sandbox(s.host, s.image, [RUNNER], run_job(r))
 }
 
 /** A field of a field of the result, as text, or "" when it isn't there. */
@@ -61,128 +75,150 @@ fun stdout_of(v: json.Value): string = text_at(v, "program", "stdout");
 fun stopped_of(v: json.Value): string = text_at(v, "program", "stopped");
 
 /** After an attack, the sandbox still answers an ordinary program. */
-fun still_works() {
-    let v = run("fun main() {{\n    println(\"still here\");\n}}\n", []).expect(
+fun still_works(s: Setup) {
+    let v = run(s, "fun main() {{\n    println(\"still here\");\n}}\n", []).expect(
         "the next run failed",
     );
     assert_eq(stdout_of(v), "still here\n");
 }
 
-@test
-fun an_endless_loop_is_stopped_after_5_seconds() {
-    if !ready() {
-        skip("set SANDBOX_TESTS=1, with runsc and the sandbox image");
-    }
-    let v = run(include_str("hostile/spin.la.txt"), []).expect("no result");
+@test(integration)
+fun an_endless_loop_is_stopped_after_5_seconds(
+    env: Env,
+    proc: Proc,
+    net: Net,
+    clock: Clock,
+    entropy: Entropy,
+) {
+    let s = setup(env, proc, net, clock, entropy);
+    let v = run(s, include_str("hostile/spin.la.txt"), []).expect("no result");
     assert_eq(stopped_of(v), "time");
-    still_works();
+    still_works(s);
 }
 
-@test
-fun allocating_forever_is_stopped_for_memory() {
-    if !ready() {
-        skip("set SANDBOX_TESTS=1, with runsc and the sandbox image");
-    }
-    let v = run(include_str("hostile/hog.la.txt"), []).expect("no result");
+@test(integration)
+fun allocating_forever_is_stopped_for_memory(
+    env: Env,
+    proc: Proc,
+    net: Net,
+    clock: Clock,
+    entropy: Entropy,
+) {
+    let s = setup(env, proc, net, clock, entropy);
+    let v = run(s, include_str("hostile/hog.la.txt"), []).expect("no result");
     assert_eq(stopped_of(v), "memory");
-    still_works();
+    still_works(s);
 }
 
-@test
-fun a_fork_bomb_is_held_by_the_process_limit() {
-    if !ready() {
-        skip("set SANDBOX_TESTS=1, with runsc and the sandbox image");
-    }
+@test(integration)
+fun a_fork_bomb_is_held_by_the_process_limit(
+    env: Env,
+    proc: Proc,
+    net: Net,
+    clock: Clock,
+    entropy: Entropy,
+) {
+    let s = setup(env, proc, net, clock, entropy);
     // prlimit --nproc fails its forks and timeout ends it. The container's own
     // pids limit sits well above it, because gVisor ends the whole sandbox
     // when that one is hit.
-    let v = run(include_str("hostile/fork_bomb.la.txt"), []).expect("no result");
+    let v = run(s, include_str("hostile/fork_bomb.la.txt"), []).expect("no result");
     assert_eq(stopped_of(v), "time");
-    still_works();
+    still_works(s);
 }
 
-@test
-fun a_flood_of_output_never_reaches_the_api_whole() {
-    if !ready() {
-        skip("set SANDBOX_TESTS=1, with runsc and the sandbox image");
-    }
+@test(integration)
+fun a_flood_of_output_never_reaches_the_api_whole(
+    env: Env,
+    proc: Proc,
+    net: Net,
+    clock: Clock,
+    entropy: Entropy,
+) {
+    let s = setup(env, proc, net, clock, entropy);
     // `std.process` in lughac can't cap what it collects yet, so the runner is
     // killed by the container's 1 GB while collecting: no result. Once it can,
     // this becomes a result with stdout truncated.
-    match run(include_str("hostile/flood.la.txt"), []) {
-        Ok(v) => assert_eq(
+    match run(s, include_str("hostile/flood.la.txt"), []) {
+        .Ok(v) => assert_eq(
             json.get(v, "program").and_then(fun(p) = json.get(p, "truncated")).and_then(
                 fun(t) = json.get(t, "stdout"),
             ),
             Some(json.Value.Bool(true)),
         ),
-        Err(e) => assert_eq(e, SandboxError.NoResult(137)),
+        .Err(e) => assert_eq(e, SandboxError.NoResult(137)),
     }
-    still_works();
+    still_works(s);
 }
 
-@test
-fun there_is_no_network() {
-    if !ready() {
-        skip("set SANDBOX_TESTS=1, with runsc and the sandbox image");
-    }
+@test(integration)
+fun there_is_no_network(env: Env, proc: Proc, net: Net, clock: Clock, entropy: Entropy) {
+    let s = setup(env, proc, net, clock, entropy);
     // http.get by name, net.connect by address, net.resolve: all fail.
-    let v = run(include_str("hostile/network.la.txt"), []).expect("no result");
+    let v = run(s, include_str("hostile/network.la.txt"), []).expect("no result");
     assert_eq(stdout_of(v), "false\nfalse\nfalse\n");
 }
 
-@test
-fun only_work_and_tmp_are_writable() {
-    if !ready() {
-        skip("set SANDBOX_TESTS=1, with runsc and the sandbox image");
-    }
+@test(integration)
+fun only_work_and_tmp_are_writable(env: Env, proc: Proc, net: Net, clock: Clock, entropy: Entropy) {
+    let s = setup(env, proc, net, clock, entropy);
     // /etc, the runner, lughac's cache: refused; /work: allowed; no Docker socket.
-    let v = run(include_str("hostile/files.la.txt"), []).expect("no result");
+    let v = run(s, include_str("hostile/files.la.txt"), []).expect("no result");
     assert_eq(stdout_of(v), "false\nfalse\nfalse\ntrue\nfalse\n");
 }
 
-@test
-fun a_shell_through_system_stays_inside() {
-    if !ready() {
-        skip("set SANDBOX_TESTS=1, with runsc and the sandbox image");
-    }
-    let out = stdout_of(run(include_str("hostile/system.la.txt"), []).expect("no result"));
+@test(integration)
+fun a_shell_through_system_stays_inside(
+    env: Env,
+    proc: Proc,
+    net: Net,
+    clock: Clock,
+    entropy: Entropy,
+) {
+    let s = setup(env, proc, net, clock, entropy);
+    let out = stdout_of(run(s, include_str("hostile/system.la.txt"), []).expect("no result"));
     let lines = out.lines();
     assert_eq(lines[0], "10001");
     assert(out.contains("no-docker-socket"));
     assert(out.contains("no-ping"));
 }
 
-@test
-fun privileges_are_refused() {
-    if !ready() {
-        skip("set SANDBOX_TESTS=1, with runsc and the sandbox image");
-    }
+@test(integration)
+fun privileges_are_refused(env: Env, proc: Proc, net: Net, clock: Clock, entropy: Entropy) {
+    let s = setup(env, proc, net, clock, entropy);
     // setuid(0) and chroot fail, the user stays 10001, and even after
     // unshare(CLONE_NEWUSER) nothing outside /work can be written.
-    let v = run(include_str("hostile/privileges.la.txt"), []).expect("no result");
+    let v = run(s, include_str("hostile/privileges.la.txt"), []).expect("no result");
     assert_eq(stdout_of(v), "-1\n10001\n-1\nfalse\nfalse\n");
 }
 
-@test
-fun a_host_file_cant_be_included_at_compile_time() {
-    if !ready() {
-        skip("set SANDBOX_TESTS=1, with runsc and the sandbox image");
-    }
-    let v = run(include_str("hostile/include.la.txt"), []).expect("no result");
+@test(integration)
+fun a_host_file_cant_be_included_at_compile_time(
+    env: Env,
+    proc: Proc,
+    net: Net,
+    clock: Clock,
+    entropy: Entropy,
+) {
+    let s = setup(env, proc, net, clock, entropy);
+    let v = run(s, include_str("hostile/include.la.txt"), []).expect("no result");
     let first = json.get(v, "compile").and_then(fun(c) = json.get(c, "diagnostics")).and_then(
         fun(d) = json.at(d, 0),
     );
     assert_eq(first.and_then(fun(d) = json.get(d, "code")).and_then(json.as_text), Some("E0447"));
 }
 
-@test
-fun arguments_arrive_as_sent_never_through_a_shell() {
-    if !ready() {
-        skip("set SANDBOX_TESTS=1, with runsc and the sandbox image");
-    }
+@test(integration)
+fun arguments_arrive_as_sent_never_through_a_shell(
+    env: Env,
+    proc: Proc,
+    net: Net,
+    clock: Clock,
+    entropy: Entropy,
+) {
+    let s = setup(env, proc, net, clock, entropy);
     let args = ["; rm -rf /", "$(id)", "`id`", "a b", "*"];
-    let v = run(include_str("hostile/args.la.txt"), args).expect("no result");
+    let v = run(s, include_str("hostile/args.la.txt"), args).expect("no result");
     assert_eq(stdout_of(v), args.join("\n") + "\n");
 }
 
@@ -191,10 +227,44 @@ fun link_and_packages_never_reach_a_sandbox() {
     // Refused while checking the request: no sandbox needed to show it.
     let body = "{{\"files\": [{{\"path\": \"src/main.la\", \"text\": \"\"}}, {{\"path\": \"lugha.toml\", \"text\": \"[package]\\nname = \\\"a\\\"\\nversion = \\\"0.1.0\\\"\\nsource = \\\"src\\\"\\n[link]\\nc = [\\\"evil.c\\\"]\\n\"}}]}}";
     match run_request(body) {
-        Err(e) => assert_eq(
+        .Err(e) => assert_eq(
             reason(e),
             "lugha.toml can only have a [package] section here; [link] isn't allowed in the browser.",
         ),
-        Ok(_) => panic("a [link] request was accepted"),
+        .Ok(_) => panic("a [link] request was accepted"),
     }
+}
+
+/** Runs `source` and gives how its program stopped ("" when it ended) and how long the job took. */
+fun timed(s: Setup, source: string): (string, i64) {
+    let began = s.host.clock.monotonic_ms();
+    let stopped = match run(s, source, []) {
+        .Ok(v) => stopped_of(v),
+        .Err(e) => "no result: {e.debug()}",
+    };
+    (stopped, s.host.clock.monotonic_ms() - began)
+}
+
+@test(integration)
+fun two_jobs_at_once_are_each_held_by_their_own_limits(
+    env: Env,
+    proc: Proc,
+    net: Net,
+    clock: Clock,
+    entropy: Entropy,
+) {
+    let s = setup(env, proc, net, clock, entropy);
+    let r = scope both {
+        let spin = both.spawn(timed(s, include_str("hostile/spin.la.txt")));
+        // Started a moment later, so the endless loop is already running.
+        task.sleep(200);
+        let ordinary = both.spawn(timed(s, "fun main() {{\n    println(\"still here\");\n}}\n"));
+        let (spin_stopped, spin_ms) = spin.join().unwrap();
+        let (ordinary_stopped, ordinary_ms) = ordinary.join().unwrap();
+        assert_eq(spin_stopped, "time");
+        assert_eq(ordinary_stopped, "");
+        // The ordinary job didn't wait for the loop's 5 seconds.
+        assert(ordinary_ms < spin_ms);
+    };
+    assert(r.is_ok());
 }

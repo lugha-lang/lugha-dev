@@ -1,5 +1,5 @@
 // Requests per IP address per minute.
-import api.server.ratelimit { Limiter, empty, allow, client_ip };
+import api.server.ratelimit { Limiter, Counts, empty, allow, client_ip };
 import api.checks.limits { REQUESTS_PER_MINUTE };
 
 const MINUTE: i64 = 60000;
@@ -55,4 +55,29 @@ fun the_client_is_cloudflares_connecting_address() {
     assert_eq(client_ip(Some("10.0.0.1, 203.0.113.7")), "unknown");
     assert_eq(client_ip(Some("")), "unknown");
     assert_eq(client_ip(None), "unknown");
+}
+
+/** Asks `counts` once for `ip` and sends 1 on `out` when allowed, else 0. */
+fun ask(counts: Counts, ip: string, out: Sender<i64>) {
+    out.send(if counts.allowed(ip, 5 * MINUTE) { 1 } else { 0 });
+}
+
+@test
+fun the_actor_counts_requests_from_tasks_running_at_once() {
+    let n = REQUESTS_PER_MINUTE + 5;
+    let (tx, rx) = Chan<i64>.new(n);
+    let r = scope s {
+        let counts = s.spawn(Counts { limiter: empty() });
+        for _ in 0..n {
+            s.spawn(ask(counts, "1.2.3.4", tx));
+        }
+        let mut allowed = 0;
+        for _ in 0..n {
+            allowed += rx.recv().unwrap();
+        }
+        assert_eq(allowed, REQUESTS_PER_MINUTE);
+        assert(counts.allowed("5.6.7.8", 5 * MINUTE));
+        counts.stop();
+    };
+    assert(r.is_ok());
 }

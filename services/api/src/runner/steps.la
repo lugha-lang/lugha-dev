@@ -19,7 +19,7 @@ import checks.limits {
 struct Command {
     cmd: string,
     args: string[],
-}
+} with Eq
 
 /** Where `lughac build` writes the visitor's program: a path no sent file can have. */
 const PROGRAM: string = "./.build/program";

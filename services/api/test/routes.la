@@ -1,6 +1,6 @@
 // The routes, with a stand-in for the sandbox: no Docker needed.
 import api.server.routes { Answer, route, SERVICE_SENTENCE };
-import api.server.ratelimit { Limiter, empty };
+import api.server.ratelimit { Counts, empty };
 import api.server.sandbox { SandboxError };
 import api.checks.limits { REQUESTS_PER_MINUTE };
 import std.json;
@@ -15,15 +15,15 @@ fun works(text: string): Result<json.Value, SandboxError> = Ok(json.parse(RESULT
 /** A sandbox that always fails. */
 fun broken(text: string): Result<json.Value, SandboxError> = Err(SandboxError.TimedOut);
 
+/** A rate limit that lets everything through. */
+fun open(ip: string, now_ms: i64): bool = true;
+
 fun call(
     method: string,
     path: string,
     body: string,
     in_sandbox: fun(string): Result<json.Value, SandboxError>,
-): Answer {
-    let (_, a) = route(empty(), method, path, body, "1.2.3.4", 60000, "lughac 0.1.0", in_sandbox);
-    a
-}
+): Answer = route(method, path, body, "1.2.3.4", 60000, "lughac 0.1.0", open, in_sandbox);
 
 fun error_of(a: Answer): string = json.get(a.body, "error").and_then(json.as_text).unwrap_or("");
 
@@ -53,15 +53,19 @@ fun a_sandbox_failure_is_503_with_no_details() {
 
 @test
 fun too_many_requests_is_429() {
-    let mut lim = empty();
-    for _ in 0..REQUESTS_PER_MINUTE {
-        let (next, a) = route(lim, "POST", "/api/run", BODY, "1.2.3.4", 60000, "v", works);
-        lim = next;
-        assert_eq(a.status, 200);
-    }
-    let (_, a) = route(lim, "POST", "/api/run", BODY, "1.2.3.4", 60000, "v", works);
-    assert_eq(a.status, 429);
-    assert_eq(error_of(a), "You're running code very fast. Wait a minute and try again.");
+    let r = scope s {
+        let counts = s.spawn(Counts { limiter: empty() });
+        let counted = fun(ip: string, now_ms: i64) = counts.allowed(ip, now_ms);
+        for _ in 0..REQUESTS_PER_MINUTE {
+            let a = route("POST", "/api/run", BODY, "1.2.3.4", 60000, "v", counted, works);
+            assert_eq(a.status, 200);
+        }
+        let a = route("POST", "/api/run", BODY, "1.2.3.4", 60000, "v", counted, works);
+        assert_eq(a.status, 429);
+        assert_eq(error_of(a), "You're running code very fast. Wait a minute and try again.");
+        counts.stop();
+    };
+    assert(r.is_ok());
 }
 
 @test

@@ -5,8 +5,8 @@ import api.checks.limits { MAX_FILES, MAX_TOTAL_BYTES };
 fun path_ok(p: string): bool = check_path(p).is_ok();
 
 fun why(list: File[]): string = match check_files(list) {
-    Err(e) => reason(e),
-    Ok(_) => "ok",
+    .Err(e) => reason(e),
+    .Ok(_) => "ok",
 };
 
 fun f(path: string, text: string): File = File { path: path, text: text };
