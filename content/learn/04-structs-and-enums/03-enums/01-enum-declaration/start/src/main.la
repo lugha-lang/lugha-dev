@@ -5,7 +5,7 @@ enum Shape {
 }
 
 fun main(console: Console) {
-    let wheel = Shape::Circle(2.0);
+    let wheel = Shape.Circle(2.0);
     let door = Shape.Rect(1.0, 2.0);
     console.println(wheel.debug());
     console.println(door.debug());

@@ -1,9 +1,0 @@
-fun square(n: i64): i64 = n * n;
-
-fun main(console: Console) {
-    let r = scope s {
-        let t = s.spawn(square(7));
-        t.join().unwrap()
-    };
-    console.println(r.debug());
-}

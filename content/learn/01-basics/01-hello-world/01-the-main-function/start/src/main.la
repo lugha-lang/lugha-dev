@@ -1,4 +1,4 @@
 /** Says hello. */
-fun main() {
-    println("Hello, world");
+fun main(console: Console) {
+    console.println("Hello, world");
 }
