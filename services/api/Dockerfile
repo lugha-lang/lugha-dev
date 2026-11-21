@@ -26,7 +26,7 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --pr
 # ---- the lughac visitors' code is compiled with, at a pinned tag ---------
 FROM toolchain AS lughac
 ARG LUGHAC_REPO=https://github.com/lugha-lang/lugha.git
-ARG LUGHAC_REF=m240
+ARG LUGHAC_REF=v0.18.1
 RUN git clone --depth 1 --branch "${LUGHAC_REF}" "${LUGHAC_REPO}" /src/lugha
 WORKDIR /src/lugha
 RUN cargo build --release --locked && cp target/release/lughac /usr/local/bin/lughac
@@ -34,7 +34,7 @@ RUN cargo build --release --locked && cp target/release/lughac /usr/local/bin/lu
 # ---- the lughac the API and the runner are built with --------------------
 FROM toolchain AS api-lughac
 ARG LUGHAC_REPO=https://github.com/lugha-lang/lugha.git
-ARG API_LUGHAC_REF=m240
+ARG API_LUGHAC_REF=v0.18.1
 RUN git clone --depth 1 --branch "${API_LUGHAC_REF}" "${LUGHAC_REPO}" /src/lugha
 WORKDIR /src/lugha
 RUN cargo build --release --locked && cp target/release/lughac /usr/local/bin/lughac

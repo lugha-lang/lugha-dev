@@ -27,8 +27,8 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  LUGHAC_REF: m240
-  API_LUGHAC_REF: m240
+  LUGHAC_REF: v0.18.1
+  API_LUGHAC_REF: v0.18.1
   REGISTRY: ghcr.io/lugha-lang/
 
 jobs:

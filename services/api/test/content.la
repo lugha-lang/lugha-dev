@@ -43,7 +43,7 @@ fun setup(env: Env, fs: Fs, proc: Proc, net: Net, clock: Clock, entropy: Entropy
     if env.get("SANDBOX_TESTS") != Some("1") {
         return None;
     }
-    let image = env.get("SANDBOX_IMAGE").unwrap_or("lugha-sandbox:m240");
+    let image = env.get("SANDBOX_IMAGE").unwrap_or("lugha-sandbox:v0.18.1");
     let has_runsc = match proc.run("docker", ["info", "--format", "{{{{json .Runtimes}}}}"]) {
         .Ok(out) => out.stdout.contains("\"runsc\""),
         .Err(_) => false,
