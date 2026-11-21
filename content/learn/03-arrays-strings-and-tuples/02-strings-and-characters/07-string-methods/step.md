@@ -2,10 +2,13 @@
 title: String methods
 ---
 
-Beyond single bytes, most work on a string goes through its methods.
-Line 3 takes the spaces off both ends with `trim` and cuts the result at each comma with `split`, which gives a `string[]`.
-`join` on line 5 puts an array of strings back together with a separator between them.
-`contains` and `starts_with` give a `bool`, and `lines` on line 8 splits at each `\n`.
+Most work on a string goes through its methods.
+Line 3 takes the spaces off both ends with `trim`, then cuts the result at each comma with `split`, which gives a `string[]`.
+`join` on line 5 puts an array of strings back together, with `" + "` between them.
+`contains` on line 6 and `starts_with` on line 7 each give a `bool`, and `lines` on line 8 splits a string at each `\n`.
 Press Run.
 
-None of them changes the string: `line` on line 7 still has its spaces, so it's trimmed again.
+Line 4 prints the three items, `["milk", "bread", "eggs"]`, and line 5 prints `milk + bread + eggs`.
+Lines 6 and 7 print `true`.
+None of these methods changes the string it's called on: `line` still has its spaces on line 7, so it's trimmed again there.
+Line 8 prints `["one", "two"]`.

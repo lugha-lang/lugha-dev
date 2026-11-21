@@ -7,3 +7,5 @@ Line 1 lists `Square`, so line 4 builds one as plain `Square`.
 `area as square_area` brings in `area` under the name `square_area`, which line 5 calls.
 `shapes.describe` on line 6 still works, since the import binds `shapes` as well.
 Press Run.
+
+The output panel shows `9.0` from line 5, then `a square of side 3.0` from line 6.

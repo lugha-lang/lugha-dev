@@ -2,9 +2,10 @@
 title: Function declaration
 ---
 
-So far `main` has been the only function, and a new one is declared the same way.
-After `fun` and the name come its parameters with their types, and after the `)` a `:` and the type it gives back.
-`main` calls `area` on line 6.
+So far `main` has been the only function, and a new one is declared the same way, with `fun`.
+Line 1 declares `area`: after its name come its parameters, `width` and `height`, each with its type, and after the `)` a `:` and its return type, the type it gives back.
+Its body on line 2 gives back `width * height`, its last expression.
+Line 6 calls `area` with `7` and `3`.
 Press Run.
 
 It prints `21`.

@@ -8,4 +8,5 @@ Line 9 prints one, and line 10 puts one in a string.
 Line 11 prints an array of versions through `.debug()`.
 Press Run.
 
+Line 9 prints `v1.10` through `show`, and line 10 puts the same text in the string.
 A debug form never uses `Display`: the array on line 11 shows each `Version` with its fields.

@@ -2,9 +2,10 @@
 title: Copies
 ---
 
-Assigning a struct, an array or an enum gives you your own copy.
-`b` on line 5 starts as a copy of `a`, and line 6 changes `b.x`.
-Press Run and look at what `a` prints.
+Line 4 makes a `Point` named `a`, and line 5 assigns it to `b`.
+Assigning a struct, an array or an enum gives the new variable a copy of its own, so `b` starts as a copy of `a`.
+Line 6 changes `b.x` to `9`.
+Press Run.
 
-`a` still has `x: 1`.
-Changing `b` never touched it: they are two separate values.
+Line 7 prints `a`, and it still has `x: 1`: changing `b` didn't touch it, because they are two separate values.
+Line 8 prints `b`, with `x: 9`.

@@ -2,10 +2,11 @@
 title: mut parameters
 ---
 
-`add_one` in Copies couldn't change its caller's array, so it returned a new one.
-A parameter written with `mut`, like `c` on line 3, works differently: the function changes the caller's own variable.
-Line 4 adds `by` to `c.n`, and lines 9 and 10 call `bump` with `mut c`.
+`bump` on line 3 has a `mut` parameter, `c`.
+A parameter without `mut` is a copy of what the caller passed, but through a `mut` parameter the function changes the caller's own variable.
+Line 4 adds `by` to `c.n`.
+Lines 9 and 10 call `bump`, and each writes `mut c` for that parameter.
+`main`'s `c` goes to `bump`'s `c` because it's the first argument, not because the names match.
 Press Run.
 
-`c.n` is `5` on line 11: each call changed `c` in `main` when it returned.
-Like a `mut self` method in Methods, `bump` works on the caller's own value, but here the call writes `mut` too, where `p.shift(10)` didn't.
+Line 11 prints `5`: each call changed `c` in `main`, the first adding `2` and the second `3`.

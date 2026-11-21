@@ -2,9 +2,11 @@
 title: pop
 ---
 
-`pop` removes the last element of an array and returns it as `Some`, or `None` when the array is empty.
-Like `push`, `pop` changes the array, so `stack` on line 2 needs `let mut`.
-It holds two numbers, and lines 3 to 5 pop three times.
+`pop` removes the last element of an array and gives it back in a `Some`, or gives `None` when the array is empty.
+Like `push`, `pop` changes the array, so line 2 declares `stack` with `let mut`.
+`stack` holds two numbers, and lines 3 to 5 pop three times.
 Press Run.
 
-The third `pop` prints `None`: popping an empty array isn't an error, and line 6 goes on to print the array, empty now.
+Lines 3 and 4 print `Some(2)` and `Some(1)`, the last element first.
+The third `pop` finds the array empty and prints `None`: popping an empty array isn't an error.
+Line 6 prints the array, `[]`, empty now.

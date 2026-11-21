@@ -2,10 +2,12 @@
 title: Tuples
 ---
 
-A tuple groups a fixed number of values, each with its own type.
+A tuple groups a fixed number of values, and each can have its own type.
 Line 2 makes one from a string and a number, in parentheses.
-A tuple prints through `.debug()`, as an array does, and `console.println(item)` alone is E0422.
-Its elements are read by position, with `.0` and `.1` on lines 4 and 5.
+Like an array, a tuple has no text form of its own, so line 3 prints it through `.debug()`, and `console.println(item)` alone would be E0422.
+Lines 4 and 5 read its elements by position, with `.0` and `.1`.
 Press Run.
 
-In the tuple's debug form the string keeps its quotes, but `item.0` on line 4 prints `milk` without them.
+Line 3 prints `("milk", 2)`: in the debug form, the string keeps its quotes.
+Line 4 prints `milk` without them, since `item.0` is the string itself.
+Line 5 prints `2`.

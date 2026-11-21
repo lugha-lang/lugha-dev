@@ -6,5 +6,5 @@ title: defer
 Line 3 defers a `console.println` that reads `n`, and line 4 changes `n` after it.
 Press Run.
 
-The deferred line prints `2`.
-It runs when `main` ends, after line 5, and reads `n` as it is then.
+Line 5 prints first, `end of main: n is 2`.
+The deferred line runs when `main` ends, after line 5, and reads `n` as it is then, so it prints `2` too.

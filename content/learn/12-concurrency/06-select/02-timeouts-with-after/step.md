@@ -9,3 +9,5 @@ Each pass of the loop is a new `select`, so the 200 milliseconds start again, an
 Press Run.
 
 Two waits of 200 milliseconds end before the message arrives, so `still waiting` prints twice.
+The third pass gets `done`, and line 17 ends the loop.
+The last line is the scope's `Ok(())`.

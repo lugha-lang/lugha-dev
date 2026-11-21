@@ -3,14 +3,15 @@ title: Names in patterns
 start_output: an empty shape\n
 ---
 
+`describe` matches on a `Shape`, and line 9's pattern is `Emtpy`, written without a dot.
 Line 16 describes a circle.
 Press Run.
 
-It prints `an empty shape`.
-`Emtpy` on line 9 is misspelled and has no dot, and a bare name in a pattern is always a new binding, even when it is the whole pattern rather than part of a variant.
-Spelled right, `Empty` would be E0468, which asks for its dot, but `Emtpy` is no variant's name, so it's read as a binding.
-A binding matches any shape, and line 9 comes first, so every shape stops there.
-`lughac` warns with W0103, "unused binding `Emtpy`", and marks lines 10 and 11 unreachable with W0102.
-With the dot, a misspelling is an error instead: `.Emtpy` is E0415, "no variant `Emtpy` on `Shape`".
-Write `.Empty` on line 9, or press Solve.
-A bare name written on purpose, as in `other =>`, catches every value the arms above it didn't and names it.
+A name without a dot in a pattern is always a new binding that matches any value, like `n` in `.Some(n)`, and that holds for a name on its own as an arm's whole pattern too.
+`Emtpy` is misspelled, so it's no variant's name, and it catches every shape.
+W0103 says "unused binding `Emtpy`", at line 9, and its help says a variant is written with a dot.
+The two W0102 warnings mark the arms on lines 10 and 11 unreachable: line 9 comes first, so no shape gets past it.
+So the circle prints `an empty shape`.
+With its dot, a misspelling is an error instead: `.Emtpy` is E0415, "no variant `Emtpy` on `Shape`".
+A bare name written on purpose, as in `other =>`, catches every value the arms above it didn't, and names it.
+Write `.Empty` on line 9 and run again, or press Solve.

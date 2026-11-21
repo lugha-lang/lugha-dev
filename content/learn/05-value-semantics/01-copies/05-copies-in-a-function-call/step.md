@@ -2,8 +2,8 @@
 title: Copies in a function call
 ---
 
-Line 9 passes `xs` to `add_one` and names what comes back `zs`.
-Lines 10 and 11 print both.
+This is `add_one` again, and line 9 now keeps what it returns, as `zs`.
+Line 10 prints `xs` and line 11 prints `zs`.
 Press Run.
 
-Line 10 prints `xs` as it was, since `add_one` changed only its own copy, and line 11 prints `zs`, with the `1` pushed on.
+Line 10 prints `[5, 6]`, since `add_one` changed only its own copy, and line 11 prints `[5, 6, 1]`, the array it returned.

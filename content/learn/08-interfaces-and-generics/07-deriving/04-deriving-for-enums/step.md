@@ -8,3 +8,5 @@ Each payload has no name of its own, so `part` gets the variant's name, unused h
 `Dot` has no payloads, so its array is empty.
 `derive.index(self)` on line 18 is the variant's position in the enum, counting from 0.
 Press Run.
+
+Each line starts with that position, then the variant's name and its payloads, each described by the `i64` or `string` block.

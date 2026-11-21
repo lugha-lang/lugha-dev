@@ -2,10 +2,11 @@
 title: Recursion
 ---
 
-A function can also call itself, and one path has to give a value without calling it again, or the calls never stop.
+A function can also call itself, which is called recursion.
 `factorial` on line 1 multiplies `n` by `factorial(n - 1)`, a call to itself.
-Its body is one `if` expression, so it uses the `=` form from Functions.
+One path has to give a value without calling the function again, or the calls never stop: here, when `n` is `1` or less, the `if` gives `1`.
+The body is one `if` expression, so it uses the `=` form from the Functions lesson.
 Press Run.
 
 It prints `120`, which is 5 × 4 × 3 × 2 × 1.
-When `n` is `1` or less, the `if` gives `1` and doesn't call `factorial` again, so the calls stop there.
+`factorial(5)` calls `factorial(4)`, and so on down to `factorial(1)`, which gives `1` and makes no more calls.

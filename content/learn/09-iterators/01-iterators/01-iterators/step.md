@@ -2,10 +2,13 @@
 title: Iterators
 ---
 
-Besides arrays, `for … of` steps through iterators, which hand out their values one at a time.
-`range(1, 4)` on line 2 is an iterator over the same numbers as the range `1..4` in Loops, `1` to `3`.
-`chars()` on line 5 gives a string's characters, and `bytes()` on line 8 its bytes, as a plain `for … of` over a string does in Bytes.
-`iter()` on line 11 makes an iterator over an array's items.
+Besides arrays, `for … of` steps through iterators: an iterator hands out its values one at a time.
+Line 2 loops over `range(1, 4)`, an iterator over the same numbers as the range `1..4`.
+Line 5 loops over `"hé".chars()`, the string's characters, and line 8 over `"hé".bytes()`, its bytes.
+Line 11 makes an iterator over an array's items with `iter()`, and line 12 loops over it.
 Press Run.
 
-`é` is one character but two bytes, `195` and `169`.
+The first loop prints `1` to `3`.
+The second prints the two characters, `h` and `é`.
+The third prints three bytes: `104` is the `h`, and `195` and `169` are the `é`, one character but two bytes.
+The last loop prints the array's items, `10` and `20`.

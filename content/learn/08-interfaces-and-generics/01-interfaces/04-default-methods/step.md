@@ -7,3 +7,5 @@ An interface can give a method a body, which is then its default.
 `Circle`'s `impl` on lines 9 to 11 has no `describe`, so line 19 uses the default.
 `Square`'s `impl` writes its own on line 15, which line 20 calls.
 Press Run.
+
+The first line comes from the default, with the circle's area, and the second from `Square`'s own `describe`.

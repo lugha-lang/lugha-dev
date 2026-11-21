@@ -1,15 +1,18 @@
 ---
 title: Sharing through a task
 start_error: E0475
+error_note: `count` is a `Ref`, and both tasks would get the same box, so they could change it at the same time. A `Ref` stays with one task, so it can't be passed to `s.spawn`.
 ---
 
-Copies of a `Ref` share one box, as in Ref.
-`bump` on line 1 adds 1 to the number in a box, and lines 8 and 9 hand the same box to two tasks.
+Copies of a `Ref` share one box.
+`bump` on line 1 adds 1 to the number in a box, lines 8 and 9 hand the same box to two tasks, and line 11 prints the number afterwards.
 Press Run.
 
-E0475 on lines 8 and 9: a `Ref` isn't `Sendable`, since two tasks would share it, and a `Ref` belongs to one task.
-Here each task can give back its answer instead, and the scope adds them up.
-When many tasks need one changing value, the help names two ways: send copies through a channel, which comes next, or keep the value in an actor, at the end of the chapter.
+The program doesn't run.
+A `Ref` isn't `Sendable`: two tasks would share its box, and a `Ref` belongs to one task.
+So each line that passes `count` to a task is an E0475, on lines 8 and 9.
+The help names two ways to share a changing value between tasks, an actor or copies sent through a channel, and both come later in this chapter.
+This fix needs neither: each task can give back its answer, and the scope can add them up.
 Make line 11 `console.println(r.debug());`.
 Replace lines 8 and 9 with `let a = s.spawn(bump(count));`, `let b = s.spawn(bump(count));` and `a.join().unwrap() + b.join().unwrap()`.
 Make line 6 `let count = 0;`.

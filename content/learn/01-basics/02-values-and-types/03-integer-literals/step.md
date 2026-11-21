@@ -2,10 +2,12 @@
 title: Integer literals
 ---
 
-Whole numbers print in plain decimal, however you write them.
-Lines 2 to 5 use `_` between digits, then `0x`, `0b` and `0o` for hex, binary and octal.
-Line 6 writes `017`.
+However a whole number is written, it prints in plain decimal.
+Line 2 groups its digits with `_`, and lines 3 to 5 write hex with `0x`, binary with `0b` and octal with `0o`.
+Line 6 writes `017`, with a leading zero.
 Press Run.
 
-It prints `17`, with warning W0107, because a leading zero changes nothing.
-Octal needs `0o`, as on line 5.
+Warning W0107 comes first: a leading zero doesn't make a number octal, so `017` is seventeen.
+Its location line points at line 6, and its help line suggests `0o17` for octal, or plain `17`.
+A warning doesn't stop the program, so the numbers print after it.
+Lines 2 to 5 give `1000000`, `255`, `10` and `15`, and line 6 gives `17`.

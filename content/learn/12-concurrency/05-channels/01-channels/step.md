@@ -8,6 +8,8 @@ A channel carries values from one task to another, in order.
 `rx.recv()` on lines 12 to 15 waits for the next value and gives `Some(v)`, or `None` once the channel is closed and empty.
 Press Run.
 
+The first three lines are the squares, each in `Some`, in the order `produce` sent them.
 The fourth `recv` gives `None`: three values came, then the close.
+The last line is the scope's value, `Ok(())`.
 Here the channel never fills; when one is full, `send` waits for room.
 A channel made with `Chan<i64>.new(0)` holds no values, so each `send` waits until a receiver takes the value.
