@@ -9,3 +9,7 @@ Line 7 writes `i64` where the interface says `Self`, since the block is for `i64
 `derive.fold(self, 0, add_up)` on line 17 starts from `0` and passes the running result through `add_up` once per field, as `sum`.
 `Reading` on line 20 asks with `with Gauge`.
 Press Run.
+
+Both lines show `45` for `a`, `20` plus `25`.
+The first is close: each field is within 1 of the other reading's.
+The second isn't, since `20` and `23` are 3 apart.

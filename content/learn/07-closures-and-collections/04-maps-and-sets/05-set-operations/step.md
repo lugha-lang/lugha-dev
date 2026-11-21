@@ -7,4 +7,5 @@ title: Set operations
 Line 7 compares two sets written in different orders, and line 8 two maps.
 Press Run.
 
-Both print `true`: `==` compares what the two hold and ignores the order.
+Lines 4 to 6 print the three new sets.
+Lines 7 and 8 both print `true`: `==` compares what the two hold and ignores the order.

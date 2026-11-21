@@ -8,3 +8,5 @@ title: Index operators
 Several indexes, as in `grid[1, 0]`, arrive as one tuple, which lines 5 and 10 take apart as `x` and `y`, and a single index is a plain parameter, such as `at: i64`.
 They're ordinary methods too: lines 20 and 21 call `set_index` and `index` by name, with the tuple written out.
 Press Run.
+
+Line 19 prints `5` and line 21 prints `9`, and line 22 shows where each value landed in `cells`.

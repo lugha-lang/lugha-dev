@@ -6,4 +6,4 @@ A `Net` reaches the network: `net.connect("example.com:80")` on line 2 opens a c
 The programs on this site run without a network.
 Press Run.
 
-So the connection is an `Err`, and line 4 prints the system's own message: the name `example.com` couldn't be looked up.
+So the connection is an `Err`, and line 4 prints it after `can't connect:`: the system's own message, saying the name `example.com` couldn't be looked up.

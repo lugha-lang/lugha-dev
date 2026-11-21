@@ -3,11 +3,12 @@ title: Passing by value
 start_output: [5, 6]\n
 ---
 
-Function arguments follow the same rule: a parameter written without `mut`, like `xs` here, is a copy of what the caller passed.
-`add_one` can't change its parameter, so line 2 copies `xs` into `ys`, and it pushes onto that and returns it.
-Line 9 calls `add_one` but throws away what it returns.
+`add_one` on line 1 takes an array, `xs`, and returns a new one with `1` pushed on.
+A parameter written without `mut`, like `xs`, is a copy of what the caller passed, and the function can't change it.
+So line 2 copies it into `ys`, line 3 pushes onto `ys`, and line 4 returns `ys`.
+Line 9 calls `add_one`, and nothing keeps what it returns.
 Press Run.
 
-Line 10 prints `xs` as it was, `[5, 6]`.
-To keep the result, assign it back: make line 9 `xs = add_one(xs);`, or press Solve.
-Through a plain parameter a function can't change its caller's values, so to keep what `add_one` built, the caller assigns what it returns.
+Line 10 prints `xs` as it was, `[5, 6]`: `add_one` changed only its own copy, and the array it returned was thrown away.
+Through a plain parameter a function can't change its caller's values, so the caller keeps what it builds by assigning what it returns.
+Make line 9 `xs = add_one(xs);` and run again, or press Solve.

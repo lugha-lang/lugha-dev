@@ -9,5 +9,5 @@ On line 19, `f` is the `Option` that `fruit.recv()` gave, in scope only in that 
 `send_late` on line 3 waits `first` milliseconds, then sends a word every 200, so `apple` comes at 100, `saw` at 200, `pear` at 300 and `drill` at 400.
 Press Run.
 
-Each pass of the loop takes the word that's ready.
+Each pass of the loop takes the word that's ready, so the four words print in the order they were sent, and the last line is the scope's `Ok(())`.
 When both channels have a value ready at once, `select` picks one of them, so a program shouldn't depend on which; the sleeps here keep the words apart.

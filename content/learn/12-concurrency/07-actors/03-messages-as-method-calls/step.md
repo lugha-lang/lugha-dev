@@ -9,4 +9,6 @@ Line 17 reads the clock, and lines 20 and 22 check how long `main` has waited at
 Press Run.
 
 Line 20 prints `true`: the two `log` calls took `main` less than 300 milliseconds, so it didn't wait for them.
-By the time `all` is handled, both messages to `log` before it have been, so it gives both lines, and line 22 shows `main` waited at least the 600 milliseconds they took.
+By the time `all` is handled, both messages to `log` before it have been, so line 21 prints both lines.
+Line 22 prints `true` too: `main` waited at least the 600 milliseconds the two `log` messages took.
+The last line is the scope's value, `Ok(())`.

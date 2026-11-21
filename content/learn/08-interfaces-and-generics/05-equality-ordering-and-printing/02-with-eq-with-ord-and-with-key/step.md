@@ -9,6 +9,7 @@ Line 6 prints a sorted copy and leaves `versions` as it was.
 Line 7 compares two versions with `<`, line 8 checks one for equality, and line 9 puts two equal tags in a set.
 Press Run.
 
+Line 6 prints the sorted copy.
 `major` is declared first, so it decides first: 1.9 and 1.10 sort before 2.0.
 Between those two, `minor` decides, and 9 comes before 10.
-The set on line 9 keeps one of the two equal tags.
+Lines 7 and 8 print `true`, and line 10 prints `1`: the set on line 9 keeps one of the two equal tags.

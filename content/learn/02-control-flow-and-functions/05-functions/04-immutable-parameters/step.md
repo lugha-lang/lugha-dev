@@ -1,12 +1,14 @@
 ---
 title: Immutable parameters
 start_error: E0501
+error_note: `price` is a parameter, and a parameter can't be given a new value, as a `let` without `mut` can't. Declare a mutable copy first with `let mut price = price;`.
 ---
 
-`with_tax` adds a tenth to `price` on line 2.
+`with_tax` takes a `price`, and line 2 tries to add a tenth to it.
 Press Run.
 
-It gives E0501 for line 2, because a parameter is like a `let` without `mut`.
-Its help suggests shadowing, which you met in Variables.
-`let mut price = price;` makes a copy you can change, and from the next line on, `price` means the copy.
-Add it as a new line 2, or press Solve.
+The program doesn't run: E0501 says "cannot assign to `price`: it is not mutable", at line 2.
+A parameter is like a variable declared with `let` and no `mut`: it can't be given a new value.
+The help line suggests shadowing, from the Variables lesson.
+`let mut price = price;` declares a new, mutable `price` from the parameter, and from the next line on, `price` means the new one.
+Add `let mut price = price;` as a new line 2 and run again, or press Solve.

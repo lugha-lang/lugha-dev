@@ -6,3 +6,5 @@ title: filter
 Line 3 keeps the even numbers.
 `filter` and `map` both give back arrays, so one can follow the other: line 5 keeps the evens, then squares them.
 Press Run.
+
+Line 4 prints the evens, `[2, 4, 6]`, and line 5 their squares.

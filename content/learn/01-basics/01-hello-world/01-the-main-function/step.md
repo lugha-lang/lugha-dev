@@ -2,9 +2,11 @@
 title: The main function
 ---
 
-A Lugha program starts at `main`, and this one prints `Hello, world`.
-Line 1 is a doc comment, `/** … */`, which editors show beside the item that follows it.
-When the program starts, `main` is given the console as a parameter, `console: Console` on line 2, and printing goes through it, as `console.println` on line 3.
+A Lugha program starts at `main`, the function that `fun` declares on line 2.
+Line 1 is a doc comment, `/** … */`, a note about the function after it.
+When the program starts, `main` is given the console as a parameter, named `console`, of type `Console`.
+Line 3 prints through it, with `console.println`.
 Press Run.
 
-The output ends with the exit code, 0: this `main` returns nothing, so the program ends with 0 when it reaches the end of `main`.
+The output panel shows `Hello, world`, then "Exited with code 0".
+That's the program's exit code: this `main` gives nothing back, so the program ends with 0 when it reaches the end of `main`.

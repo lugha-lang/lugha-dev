@@ -1,12 +1,16 @@
 ---
 title: Re-exports
 start_error: E0313
+error_note: `shapes.la` imports `Square` and `area` on line 1, but an import's names stay private to the module that imports them, so `main.la` can't reach them through `shapes`.
 ---
 
-A module in a folder is named with a dot: `src/geo/square.la` is `geo.square`, and it declares `Square` and `area`.
-`shapes.la` imports both on line 1, with no keyword in front of `import`, and `main.la` uses them as `shapes.Square` and `shapes.area`.
+A module in a folder is named with a dot: `src/geo/square.la` is the module `geo.square`, and it declares `Square` and `area`, both `public`.
+Line 1 of `src/shapes.la` imports both, with no keyword in front of `import`.
+`src/main.la` imports only `shapes`, and uses the two as `shapes.Square` on line 4 and `shapes.area` on lines 5 and 6.
 Press Run.
 
-E0313 on lines 4 to 6 of `main.la`: the names an import brings in are private to the module that imports them, here `shapes`.
-`public` in front of the import, `public import geo.square { Square, area };`, makes the two part of `shapes`, visible to every package, as if `shapes` declared them `public`.
-Add `public ` at the start of line 1 of `shapes.la`, or press Solve.
+The program doesn't run.
+The names an import brings in are private to the module that imports them, here `shapes`, so each use in `main.la` is an E0313, on lines 4, 5 and 6.
+Each help says to remove `private`, though there's none to remove: an import's names are private without one.
+`public` in front of the import makes the two part of `shapes`, visible to every package, as if `shapes` declared them `public`.
+Add `public ` at the start of line 1 of `shapes.la` and run again, or press Solve.

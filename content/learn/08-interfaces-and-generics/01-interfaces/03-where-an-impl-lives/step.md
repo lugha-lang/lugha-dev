@@ -1,14 +1,18 @@
 ---
 title: Where an impl lives
 start_error: E0459
+error_note: An `impl` must be written in the module that declares the interface or the one that declares the type. `Display` and `bool` both come with the language, so this program can't implement one for the other.
 ---
 
-A program can be split into modules, which come in Modules in chapter 11; every program so far has been one.
-An `impl` is written in the module that declares the interface or the one that declares the type.
-Line 1 implements `Display` for `bool`, so that `true` would print as `yes`; `Display` is the interface `console.println` prints through.
+An `impl` is written in the module that declares the interface or the one that declares the type; a module is one part of a program, and every program so far has been a single module.
+`Display` is the interface `console.println` prints through, and its method is `show`.
+Lines 1 to 3 implement it for `bool`, to print `true` as `yes`.
 Press Run.
 
-E0459: "this `impl Display for …` must be written in the module that declares `Display`".
-`Display` and `bool` both come with the language, so neither is declared in this program, and no `impl` here can implement one for the other.
-Declare an interface of your own instead: above line 1, write an interface `Label` with one method, `fun label(self): string;`, then change line 1 to `impl Label for bool {`, `show` on line 2 to `label`, and line 6 to print `true.label()`, or press Solve.
-For a type you declare yourself, `impl Display` is allowed, as Equality, ordering and printing shows later in this chapter.
+The program doesn't run.
+`Display` and `bool` both come with the language, so no `impl` in this program can implement one for the other.
+E0459 says so at line 1: "this `impl Display for …` must be written in the module that declares `Display`".
+For a type you declare yourself, `impl Display` is allowed.
+Use an interface of your own instead.
+Change line 6 to print `true.label()`, `show` on line 2 to `label`, and line 1 to `impl Label for bool {`.
+Then, above line 1, declare an interface `Label` with one method, `fun label(self): string;`, and run again, or press Solve.

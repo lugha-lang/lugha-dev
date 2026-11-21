@@ -1,12 +1,15 @@
 ---
 title: String concatenation
 start_error: E0404
+error_note: `+` joins two strings, and `points` is a number, which `+` won't turn into text. Put it inside the string in braces instead.
 ---
 
-Braces aren't the only way to build a string: `+` joins two strings into a new one.
-Line 4 uses it to build a sentence from `name`, `" has "` and `points`.
+`+` also joins two strings into a new one.
+Line 4 tries to build a sentence with it, from `name`, `" has "` and `points`, which is an `i64`.
 Press Run.
 
-Line 4 stops at E0404, "cannot apply `+` to string and i64".
-`+` only joins strings, and a number never turns into one by itself.
-Put the number in braces inside the string instead: on line 4, drop `+ points` and write `{points}` at the end of `" has "`, or press Solve.
+The program doesn't run.
+E0404 says "cannot apply `+` to string and i64", at line 4.
+`+` joins only strings, and a number never turns into a string by itself.
+Braces in a string do turn it into text, so the number can go inside the string instead.
+On line 4, drop `+ points` and change `" has "` to `" has {points}"`, then run again, or press Solve.

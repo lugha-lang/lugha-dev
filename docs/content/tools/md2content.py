@@ -265,7 +265,15 @@ def convert_step(lesson, step, carried):
             front["start_output"] = outputs.get("start", "").replace("\n", "\\n")
         else:
             raise ConvertError(f"{where}: its start prints, but no `Output (start):` block says what")
-    text, svgs = diagrams(step.prose)
+    # A step's own words for its start error go to the panel beside that error, not into its text.
+    prose, note = step.prose, None
+    m = re.search(r"\n*^Error note: (.+)$", prose, re.M)
+    if m:
+        prose, note = (prose[:m.start()] + prose[m.end():]).strip("\n"), m.group(1).strip()
+        if "start_error" not in front:
+            raise ConvertError(f"{where}: an error note needs a start that fails to compile")
+        front["error_note"] = note
+    text, svgs = diagrams(prose)
     carried_names = sorted(p for p in start if p in carried and p not in shown)
     return Converted(step.n, step.title, front, text, start, solution, outputs.get("solution"), svgs, carried_names)
 

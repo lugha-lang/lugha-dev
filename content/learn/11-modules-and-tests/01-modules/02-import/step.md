@@ -1,12 +1,14 @@
 ---
 title: import
 start_error: E0305
+error_note: `shapes.Square` names a type in the module `shapes`, but this file has no `import shapes;`, so the name `shapes` means nothing here.
 ---
 
-`main.la` has lost its `import`, though `shapes.la` is still there.
+`src/main.la` is the same as before without its `import` line, and `src/shapes.la` hasn't changed.
 Press Run.
 
-`lughac` stops with E0305 for the type on line 2, "cannot find type `shapes.Square`", and E0301 for the names on lines 3 and 4.
-Having `shapes.la` in the project isn't enough: `main.la` needs the `import`, and that binds the name `shapes`.
-Every item from the module is then written with `shapes.` in front, as `main` already does.
-Add `import shapes;` as a new line 1, with an empty line after it, or press Solve.
+This time the program doesn't run.
+Having `shapes.la` in the project isn't enough: without the `import`, nothing in `main.la` binds the name `shapes`.
+E0305 comes first: it can't find the type `shapes.Square` on line 2.
+The two E0301 errors say the same about `shapes` in the calls on lines 3 and 4: nothing in scope is called `shapes`.
+Add `import shapes;` as a new line 1 of `src/main.la`, with an empty line after it, and run again, or press Solve.

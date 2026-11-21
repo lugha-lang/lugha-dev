@@ -2,8 +2,9 @@
 title: String length
 ---
 
-A string's `.len`, like an array's, is read without parentheses, and line 3 prints it for `Zoë`, a name of three letters.
+A string's `.len` is read without parentheses, like an array's, and line 3 prints it for `Zoë`, a name of three letters.
+Line 4 calls `char_count()`, a method, so it has parentheses.
 Press Run.
 
-It prints `4`, because `.len` counts bytes and `ë` takes two of them in UTF-8.
-Line 4 counts characters with `char_count()`, a method you call, so it prints `3`.
+Line 3 prints `4`, because `.len` counts bytes: a string's text is stored as UTF-8, where `Z` and `o` take one byte each and `ë` takes two.
+Line 4 prints `3`, because `char_count()` counts characters.

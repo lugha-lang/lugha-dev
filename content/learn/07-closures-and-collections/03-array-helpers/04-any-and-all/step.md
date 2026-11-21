@@ -7,4 +7,6 @@ title: any and all
 `all` on line 4 asks whether every age is under 18, and on line 5 whether every age is above `0`.
 Press Run.
 
-`any` is `true` because of `17`; `all` on line 4 is `false` because of `34`, and `52` too.
+Line 3 prints `true`, because `17` is under 18.
+Line 4 prints `false`, because `34` and `52` aren't.
+Line 5 prints `true`, since every age is above `0`.

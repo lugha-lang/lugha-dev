@@ -7,3 +7,5 @@ Line 5 says how every `i64` gets `Describe`, and line 9 does the same for `strin
 `tell` on line 13 takes any `T: Describe`, so lines 16 and 17 call it with either.
 A block's items are reached through the interface: through a bound such as `tell`'s, or by naming it, as `Describe.describe(7)` on line 18 does.
 Press Run.
+
+Line 16 prints through the `string` block, and lines 17 and 18 through the `i64` block.

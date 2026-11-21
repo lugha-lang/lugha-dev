@@ -134,6 +134,19 @@ class Steps(unittest.TestCase):
         self.assertIn("println(2)", st.solution["src/main.la"])
         self.assertEqual((st.front["start_error"], st.expected), ("E0301", "2\n"))
 
+    def test_error_note(self):
+        noted = LESSON.replace("Change it, or press Solve.\n", "Change it, or press Solve.\n\nError note: `x` was never declared.\n")
+        lesson = m.parse_lesson("9.9-a-lesson.md", noted)
+        st = m.convert_step(lesson, lesson.steps[1], {})
+        self.assertEqual(st.front["error_note"], "`x` was never declared.")
+        self.assertNotIn("Error note", st.text)
+
+    def test_error_note_needs_a_start_error(self):
+        noted = LESSON.replace("It prints `1`.\n", "It prints `1`.\n\nError note: none here.\n")
+        lesson = m.parse_lesson("9.9-a-lesson.md", noted)
+        with self.assertRaises(m.ConvertError):
+            m.convert_step(lesson, lesson.steps[0], {})
+
     def test_stray_text_stops_it(self):
         bad = LESSON.replace("Output:\n", "A stray sentence.\n\nOutput:\n")
         lesson = m.parse_lesson("9.9-a-lesson.md", bad)
