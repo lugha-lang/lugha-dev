@@ -3,7 +3,7 @@
 
 /** Gives every sentence the interface shows. */
 export const copy = {
-  headline: "A language that doesn't get in your way, but still has your back.",
+  headline: "For code you can trust.",
   nav: { learn: "Learn", examples: "Examples", playground: "Playground", github: "GitHub", home: "Lugha home" },
   home: { start: "Start learning", examples: "Examples", playground: "Playground", card: "fib.la" },
   footer: (version: string) => [version, "Lugha v18", "Free software, GPL-3.0"],
