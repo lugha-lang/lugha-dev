@@ -25,7 +25,8 @@ test("step 2: Run shows E0501 and its explanation; Solve, then Run, shows the ou
   await page.getByRole("button", { name: "Run" }).click();
   await expect(page.locator(".diagnostics")).toContainText("error[E0501]: cannot assign to `b`: it is not mutable");
   await expect(page.locator(".diagnostics")).toContainText("--> src/main.la:6:5");
-  await expect(page.locator(".explain")).toContainText("isn't mutable");
+  // The step's own note stands in for lughac's first paragraph.
+  await expect(page.locator(".explain")).toContainText("It doesn't take its mut from a");
   await expect(page.locator(".cm-error-line")).toHaveCount(1);
   await page.getByRole("button", { name: "More about E0501" }).click();
   await expect(page.locator(".explain .rest")).toBeVisible();
@@ -78,7 +79,7 @@ test("a step's diagram shows in the text, named for screen readers", async ({ pa
   await expect(page.getByRole("img", { name: "a and b both point at one box, which holds 5" })).toBeVisible();
   // It comes after what the program printed, which it pictures.
   const box = await figure.boundingBox();
-  const prints = await page.getByText("It prints 5.").boundingBox();
+  const prints = await page.getByText("It prints 5, though line 4 called set on b.").boundingBox();
   expect(box!.y).toBeGreaterThan(prints!.y);
 });
 
