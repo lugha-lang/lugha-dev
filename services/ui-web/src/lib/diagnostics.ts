@@ -62,3 +62,16 @@ export function errorLines(ds: Diagnostic[], file: string): number[] {
   const lines = ds.filter((d) => d.severity === "error" && d.file === file).map((d) => d.line);
   return [...new Set(lines)].sort((a, b) => a - b);
 }
+
+/**
+ * Gives `ds` with each file named by the project's path for it. `lughac test` names a file by its
+ * name alone (`main.la`) where `build` and `fmt` give its path (`src/main.la`), and the editor marks
+ * lines by path. A name that matches no path, or several, stays as it is.
+ */
+export function onPaths(ds: Diagnostic[], paths: string[]): Diagnostic[] {
+  return ds.map((d) => {
+    if (paths.includes(d.file)) return d;
+    const found = paths.filter((p) => p.endsWith(`/${d.file}`));
+    return found.length === 1 ? { ...d, file: found[0] } : d;
+  });
+}

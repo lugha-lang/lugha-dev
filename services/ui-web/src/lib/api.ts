@@ -162,10 +162,10 @@ export interface Summary {
   uncompiled: number;
 }
 
-/** Describes a Test's answer: the tests and their summary, or lughac's text when they didn't compile. */
+/** Describes a Test's answer: the tests and their summary, or lughac's errors (text and diagnostics) when they didn't compile. */
 export type TestOutcome =
   | { state: "tested"; tests: TestLine[]; summary: Summary; stopped: Stopped | null }
-  | { state: "test-compile-error"; text: string };
+  | { state: "test-compile-error"; text: string; diagnostics: Diagnostic[] };
 
 function asTestLine(v: unknown): TestLine | null {
   if (!isObj(v)) return null;
@@ -204,7 +204,7 @@ function asSummary(v: unknown): Summary | null {
 export function readTest(v: unknown): TestOutcome | null {
   if (!isResult(v, "test") || !Array.isArray(v.tests)) return null;
   if (typeof v.compile_error === "string") {
-    return { state: "test-compile-error", text: v.compile_error };
+    return { state: "test-compile-error", text: v.compile_error, diagnostics: asDiagnostics(v.diagnostics ?? []) };
   }
   const tests = v.tests.map(asTestLine);
   const summary = asSummary(v.summary);
@@ -213,16 +213,16 @@ export function readTest(v: unknown): TestOutcome | null {
   return { state: "tested", tests: tests as TestLine[], summary, stopped };
 }
 
-/** Describes a Format's answer: the formatted files, or lughac's error text. */
+/** Describes a Format's answer: the formatted files, or lughac's errors (text and diagnostics). */
 export type FormatOutcome =
   | { state: "formatted"; files: File[] }
-  | { state: "format-error"; text: string };
+  | { state: "format-error"; text: string; diagnostics: Diagnostic[] };
 
 /** Reads a Format's JSON; null when it isn't the API's answer to a Format. */
 export function readFormat(v: unknown): FormatOutcome | null {
   if (!isResult(v, "format")) return null;
   if (typeof v.error === "string") {
-    return { state: "format-error", text: v.error };
+    return { state: "format-error", text: v.error, diagnostics: asDiagnostics(v.diagnostics ?? []) };
   }
   if (!Array.isArray(v.files)) return null;
   const files: File[] = [];

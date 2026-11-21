@@ -149,7 +149,12 @@ describe("readTest", () => {
 
   it("reads tests that didn't compile, with lughac's text", () => {
     const r = readTest({ v: 1, kind: "test", tests: [], summary: { passed: 0, failed: 0, skipped: 0, uncompiled: 1 }, compile_error: "error[E0501]: …\n", stopped: null });
-    expect(r).toEqual({ state: "test-compile-error", text: "error[E0501]: …\n" });
+    expect(r).toEqual({ state: "test-compile-error", text: "error[E0501]: …\n", diagnostics: [] });
+  });
+
+  it("reads the diagnostics of tests that didn't compile", () => {
+    const r = readTest({ v: 1, kind: "test", tests: [], summary: { passed: 0, failed: 0, skipped: 0, uncompiled: 1 }, compile_error: "error[E0201]: expected `;`\n", stopped: null, diagnostics: [{ severity: "error", code: "E0201", message: "expected `;`", file: "main.la", span: { start: { line: 3, col: 5 } }, help: null, rendered: "error[E0201]: expected `;`\n" }] });
+    expect(r).toMatchObject({ state: "test-compile-error", diagnostics: [{ code: "E0201", file: "main.la", line: 3, rendered: "error[E0201]: expected `;`\n" }] });
   });
 
   it("gives null for anything else", () => {
@@ -165,7 +170,12 @@ describe("readFormat", () => {
   });
 
   it("reads lughac fmt's error text", () => {
-    expect(readFormat({ v: 1, kind: "format", error: "error: …\n", stopped: null })).toEqual({ state: "format-error", text: "error: …\n" });
+    expect(readFormat({ v: 1, kind: "format", error: "error: …\n", stopped: null })).toEqual({ state: "format-error", text: "error: …\n", diagnostics: [] });
+  });
+
+  it("reads lughac fmt's diagnostics", () => {
+    const r = readFormat({ v: 1, kind: "format", error: "error[E0201]: expected `;`\n", stopped: null, diagnostics: [{ severity: "error", code: "E0201", message: "expected `;`", file: "main.la", span: { start: { line: 3, col: 5 } }, help: null, rendered: "error[E0201]: expected `;`\n" }] });
+    expect(r).toMatchObject({ state: "format-error", diagnostics: [{ code: "E0201", line: 3 }] });
   });
 
   it("gives null for anything else", () => {

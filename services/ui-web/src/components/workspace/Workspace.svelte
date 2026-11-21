@@ -5,7 +5,7 @@
   // the functions this component exports.
   import { browserDeps, call, readFormat, readTest } from "../../lib/api";
   import { copy } from "../../lib/copy";
-  import { errorLines } from "../../lib/diagnostics";
+  import { errorLines, onPaths, type Diagnostic } from "../../lib/diagnostics";
   import { failureSentence, runPanel, type Panel } from "../../lib/panel";
   import type { Project } from "../../lib/project";
   import { testText } from "../../lib/testtext";
@@ -37,7 +37,14 @@
   let tab = $state<"output" | "tests" | "input">("output");
 
   const file = $derived(project.files.find((f) => f.path === current) ?? project.files[0]);
-  const marks = $derived(panel.kind === "compile-error" ? errorLines(panel.diagnostics, file.path) : []);
+  // Run and Format put a compile error in the Output tab, Test in the Tests tab; either marks the editor.
+  const marks = $derived(
+    panel.kind === "compile-error"
+      ? errorLines(panel.diagnostics, file.path)
+      : tests.kind === "compile-error"
+        ? errorLines(tests.diagnostics, file.path)
+        : [],
+  );
 
   function edit(text: string) {
     if (text === file.text) return;
@@ -56,6 +63,12 @@
     if (panel.kind === "compile-error") onran?.({ compiled: false, exit: 1, stdout: "" });
   }
 
+  /** Gives the panel for lughac's errors from Format or Test: as Run shows them, or its text when the answer has no diagnostics. */
+  function errorPanel(diagnostics: Diagnostic[], text: string): Panel {
+    if (diagnostics.length === 0) return { kind: "text", text };
+    return { kind: "compile-error", diagnostics: onPaths(diagnostics, project.files.map((f) => f.path)) };
+  }
+
   export async function test() {
     if (busy) return;
     busy = true;
@@ -66,7 +79,7 @@
     else {
       const o = readTest(r.value);
       if (o === null) tests = { kind: "message", sentence: copy.service };
-      else if (o.state === "test-compile-error") tests = { kind: "text", text: o.text };
+      else if (o.state === "test-compile-error") tests = errorPanel(o.diagnostics, o.text);
       else tests = { kind: "text", text: testText(o) };
       if (o !== null) {
         const s = o.state === "tested" ? o.summary : null;
@@ -88,7 +101,7 @@
     }
     const o = readFormat(r.value);
     if (o === null) panel = { kind: "message", sentence: copy.service };
-    else if (o.state === "format-error") panel = { kind: "text", text: o.text };
+    else if (o.state === "format-error") panel = errorPanel(o.diagnostics, o.text);
     else if (o.files.length > 0) {
       const changed = new Map(o.files.map((f) => [f.path, f.text]));
       onchange({ ...project, files: project.files.map((f) => ({ ...f, text: changed.get(f.path) ?? f.text })) });

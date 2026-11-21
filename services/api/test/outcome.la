@@ -116,6 +116,34 @@ fun tests_that_dont_compile_give_the_error_text() {
     assert_eq(at(r, ["compile_error"]), json.Value.Text(err));
 }
 
+/** A syntax error as `lughac test` and `lughac fmt` write it with `--diagnostics=json` (0.18.1). */
+const E0201: string = "{{\"severity\":\"error\",\"code\":\"E0201\",\"message\":\"expected `;`, found identifier `console`\",\"file\":\"src/main.la\",\"span\":{{\"start\":{{\"line\":3,\"col\":5,\"offset\":47}},\"end\":{{\"line\":3,\"col\":12,\"offset\":54}}}},\"label\":null,\"labels\":[],\"help\":null,\"rendered\":\"error[E0201]: expected `;`, found identifier `console`\\n  --> src/main.la:3:5\\n\"}}";
+
+@test
+fun tests_that_dont_compile_give_their_diagnostics() {
+    let out = "{{\"summary\":{{\"passed\":0,\"failed\":0,\"skipped\":0,\"uncompiled\":1}}}}\n";
+    let r = parsed(test_result(Captured { code: 1, stdout: out, stderr: E0201 + "\n" }));
+    assert_eq(json.at(at(r, ["diagnostics"]), 0).unwrap(), parsed(E0201));
+    assert_eq(
+        at(r, ["compile_error"]),
+        json.Value.Text(
+            "error[E0201]: expected `;`, found identifier `console`\n  --> src/main.la:3:5\n",
+        ),
+    );
+}
+
+@test
+fun a_format_error_gives_its_diagnostics() {
+    let r = parsed(format_result(Captured { code: 1, stdout: "", stderr: E0201 + "\n" }, [], []));
+    assert_eq(json.at(at(r, ["diagnostics"]), 0).unwrap(), parsed(E0201));
+    assert_eq(
+        at(r, ["error"]),
+        json.Value.Text(
+            "error[E0201]: expected `;`, found identifier `console`\n  --> src/main.la:3:5\n",
+        ),
+    );
+}
+
 @test
 fun formatting_returns_only_what_changed() {
     let before = [

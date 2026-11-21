@@ -76,6 +76,25 @@ fun diagnostics(stderr: string): json.Value {
     json.Value.Array(found)
 }
 
+/**
+ * Gives the text of `lughac`'s diagnostics in `stderr` as its human format prints them, each
+ * one's `rendered` in turn, or `stderr` itself when it holds none, so a client that shows text
+ * still shows words.
+ */
+fun rendered_text(stderr: string): string {
+    let mut text = "";
+    let mut any = false;
+    for line of stderr.lines() {
+        if let .Ok(v) = json.parse(line) {
+            if let .Some(r) = json.get(v, "rendered").and_then(json.as_text) {
+                text = text + r;
+                any = true;
+            }
+        }
+    }
+    if any { text } else { stderr }
+}
+
 /** Builds the compile part of a Run result. */
 fun compile_part(build: Captured): json.Value = json.Value.Object(Map {
     "ok": json.Value.Bool(build.code == 0),
@@ -111,9 +130,9 @@ fun run_result(
 } });
 
 /**
- * Writes a Test result: each `lughac test --json` line, the summary, and the
- * compile errors' text when tests didn't compile (`lughac test` prints those
- * as text, not JSON).
+ * Writes a Test result: each `lughac test --json` line, the summary, and,
+ * when tests didn't compile, the compile errors as diagnostics and as their
+ * text.
  */
 fun test_result(t: Captured): string {
     let mut tests: json.Value[] = [];
@@ -129,25 +148,27 @@ fun test_result(t: Captured): string {
         }
     }
     let uncompiled = json.get(summary, "uncompiled").and_then(json.as_i64).unwrap_or(0);
-    let (err, _) = cap(t.stderr);
+    let (err, _) = cap(rendered_text(t.stderr));
     written(Map {
         "v": json.Value.Integer(1),
         "kind": json.Value.Text("test"),
         "tests": json.Value.Array(tests),
         "summary": summary,
         "compile_error": if uncompiled > 0 { json.Value.Text(err) } else { json.Value.Null },
+        "diagnostics": diagnostics(t.stderr),
         "stopped": maybe(stopped(t.code, t.stderr)),
     })
 }
 
-/** Writes a Format result: the files whose text changed, or `lughac fmt`'s error text. */
+/** Writes a Format result: the files whose text changed, or `lughac fmt`'s errors as diagnostics and as their text. */
 fun format_result(f: Captured, before: File[], after: File[]): string {
     if f.code != 0 {
-        let (err, _) = cap(f.stderr);
+        let (err, _) = cap(rendered_text(f.stderr));
         return written(Map {
             "v": json.Value.Integer(1),
             "kind": json.Value.Text("format"),
             "error": json.Value.Text(err),
+            "diagnostics": diagnostics(f.stderr),
             "stopped": maybe(stopped(f.code, f.stderr)),
         });
     }
