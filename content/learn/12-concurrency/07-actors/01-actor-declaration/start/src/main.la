@@ -1,0 +1,19 @@
+actor Counter {
+    count: i64,
+
+    fun add(mut self, n: i64) {
+        self.count += n;
+    }
+
+    fun get(self): i64 = self.count;
+}
+
+fun main(console: Console) {
+    let r = scope s {
+        let c = s.spawn(Counter { count: 0 });
+        c.add(2);
+        c.add(3);
+        console.println(c.get());
+    };
+    console.println(r.debug());
+}

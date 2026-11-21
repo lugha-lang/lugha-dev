@@ -1,0 +1,30 @@
+interface Describe {
+    fun describe(self): string;
+}
+
+derive Describe for i64 {
+    fun describe(self): string = "{self}";
+}
+
+derive Describe for string {
+    fun describe(self): string = "\"{self}\"";
+}
+
+fun part<F: Describe>(ctx: (), name: string, field: F): string = field.describe();
+
+derive Describe for enum {
+    fun describe(self): string {
+        let (name, parts) = derive.variant(self, (), part);
+        return "variant {derive.index(self)}, {name}({parts.join(", ")})";
+    }
+}
+
+enum Shape { Dot, Square(i64), Label(string, i64) } with Describe
+
+fun tell<T: Describe>(x: T): string = x.describe();
+
+fun main(console: Console) {
+    console.println(tell(Shape.Dot));
+    console.println(tell(Shape.Square(3)));
+    console.println(tell(Shape.Label("door", 2)));
+}

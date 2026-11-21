@@ -8,6 +8,6 @@ fun first_over(limit: i64): i64 {
     }
 }
 
-fun main() {
-    println(first_over(100));
+fun main(console: Console) {
+    console.println(first_over(100));
 }

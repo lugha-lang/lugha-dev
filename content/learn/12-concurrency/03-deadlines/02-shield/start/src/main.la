@@ -1,0 +1,15 @@
+import std.task;
+
+fun save(console: Console) {
+    console.println("saving");
+    task.sleep(200);
+    console.println("saved");
+    console.println("after saving");
+}
+
+fun main(console: Console) {
+    let r = scope s within 100 {
+        s.spawn(save(console));
+    };
+    console.println(r.is_err());
+}

@@ -1,0 +1,14 @@
+fun main(console: Console, fs: Fs): i32 {
+    let dir = fs.cwd();
+    match dir.read_file("notes.txt") {
+        .Ok(text) => console.print(text),
+        .Err(e) => console.println("can't read notes.txt: {e}"),
+    }
+    console.println(dir.write_file("notes.txt", "milk\n").debug());
+    console.println(dir.append_file("notes.txt", "eggs\n").debug());
+    match dir.read_file("notes.txt") {
+        .Ok(text) => console.print(text),
+        .Err(e) => console.println("can't read notes.txt: {e}"),
+    }
+    0
+}

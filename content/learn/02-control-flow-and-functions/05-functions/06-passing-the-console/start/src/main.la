@@ -1,0 +1,7 @@
+fun greet() {
+    console.println("Hello");
+}
+
+fun main(console: Console) {
+    greet();
+}

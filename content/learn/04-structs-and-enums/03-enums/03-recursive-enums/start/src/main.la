@@ -5,13 +5,13 @@ enum List {
 
 fun sum(list: List): i64 {
     match list {
-        Nil => 0,
-        Cons(head, rest) => head + sum(rest),
+        .Nil => 0,
+        .Cons(head, rest) => head + sum(rest),
     }
 }
 
-fun main() {
+fun main(console: Console) {
     let numbers = List.Cons(1, List.Cons(2, List.Cons(3, List.Nil)));
-    println(numbers);
-    println(sum(numbers));
+    console.println(numbers.debug());
+    console.println(sum(numbers));
 }

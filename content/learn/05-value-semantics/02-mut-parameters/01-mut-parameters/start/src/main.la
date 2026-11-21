@@ -1,0 +1,12 @@
+struct Counter { n: i64 }
+
+fun bump(mut c: Counter, by: i64) {
+    c.n += by;
+}
+
+fun main(console: Console) {
+    let mut c = Counter { n: 0 };
+    bump(mut c, 2);
+    bump(mut c, 3);
+    console.println(c.n);
+}

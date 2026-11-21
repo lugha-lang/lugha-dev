@@ -1,0 +1,8 @@
+struct Point { x: i64, y: i64 }
+
+fun main(console: Console) {
+    let shared = Ref.new(Point { x: 1, y: 2 });
+    let mut p = shared.get();
+    p.x = 9;
+    console.println(shared.get().debug());
+}

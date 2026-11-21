@@ -1,0 +1,16 @@
+fun tidy(console: Console, dir: Dir): Result<(), string> {
+    dir.make_dirs("out/logs")?;
+    dir.write_file("out/logs/today.txt", "ran\n")?;
+    console.println(dir.list("out").debug());
+    console.println(dir.exists("out/logs/today.txt"));
+    dir.remove_file("out/logs/today.txt")?;
+    dir.remove_dir("out/logs")?;
+    console.println(dir.list("out").debug());
+    Ok(())
+}
+
+fun main(console: Console, fs: Fs) {
+    if let .Err(e) = tidy(console, fs.cwd()) {
+        console.println("error: {e}");
+    }
+}

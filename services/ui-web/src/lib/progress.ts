@@ -10,6 +10,12 @@ export type Event =
   | { kind: "answer"; correct: boolean }
   | { kind: "test"; passed: boolean };
 
+/**
+ * Names the course's shape. It goes up when chapters, lessons or steps are replaced, so progress and
+ * edits kept for the old ones are cleared; a change to a step's text leaves it as it is.
+ */
+export const COURSE = 2;
+
 /** Lists the ids ("chapter/lesson/step") of the steps done. */
 export interface Progress {
   done: string[];

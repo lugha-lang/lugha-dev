@@ -1,0 +1,22 @@
+struct Version { major: i64, minor: i64 } with Eq
+
+impl Ord for Version {
+    fun cmp(self, other: Version): Ordering {
+        if self.major < other.major {
+            Ordering.Less
+        } else if self.major > other.major {
+            Ordering.Greater
+        } else {
+            Ordering.Equal
+        }
+    }
+}
+
+fun main(console: Console) {
+    let releases = [Version { major: 2, minor: 0 }, Version { major: 1, minor: 9 }, Version { major: 1, minor: 10 }];
+    console.println(releases.sort().debug());
+    let a = releases[1];
+    let b = releases[2];
+    console.println(a == b);
+    console.println(a < b || b < a);
+}

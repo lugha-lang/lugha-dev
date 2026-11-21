@@ -1,7 +1,7 @@
-fun main() {
+fun main(console: Console) {
     let mut a = 1;
     let mut b = 2;
     a = 0;
     b = 0;
-    println(a + b);
+    console.println(a + b);
 }

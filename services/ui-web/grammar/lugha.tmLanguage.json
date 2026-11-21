@@ -16,7 +16,6 @@
         { "include": "#number" },
         { "include": "#declaration" },
         { "include": "#c-marker" },
-        { "include": "#hashed" },
         { "include": "#import" },
         { "include": "#keyword" },
         { "include": "#builtin" },
@@ -44,12 +43,13 @@
     "declaration": {
       "patterns": [
         {
-          "comment": "`extern type Name;`: a handle (v16, milestone 88); `type` is a keyword only here.",
-          "match": "\\b(extern)\\s+(type)\\s+([A-Za-z_][A-Za-z0-9_]*)",
+          "comment": "`extern type Name;`: a handle (v16, milestone 88); `type` is a keyword only here, and `pinned` after the name (v18, milestone 214).",
+          "match": "\\b(extern)\\s+(type)\\s+([A-Za-z_][A-Za-z0-9_]*)(?:\\s+(pinned)\\b)?",
           "captures": {
             "1": { "name": "keyword.other.extern.lugha" },
             "2": { "name": "keyword.other.type.lugha" },
-            "3": { "name": "entity.name.type.lugha" }
+            "3": { "name": "entity.name.type.lugha" },
+            "4": { "name": "keyword.other.pinned.lugha" }
           }
         },
         {
@@ -116,6 +116,11 @@
           "name": "storage.modifier.out.lugha",
           "match": "\\b(?:out|ptr)(?=\\s+[A-Za-z_0-9\\[\"'#])|(?<=\\bextern\\s)union\\b"
         },
+        {
+          "comment": "`direct`, `spawned` or `realtime` before an extern callback's `fun` (v18, milestones 216 and 219): how C's call runs it.",
+          "name": "storage.modifier.callback.lugha",
+          "match": "(?<=:)\\s*\\b(?:direct|spawned|realtime)(?=\\s+fun\\b)"
+        },
         { "name": "keyword.operator.as.lugha", "match": "\\bas\\b" },
         { "name": "constant.language.boolean.lugha", "match": "\\b(true|false)\\b" },
         { "name": "variable.language.self.lugha", "match": "\\bself\\b" },
@@ -125,7 +130,7 @@
     "builtin": {
       "patterns": [
         { "name": "support.constant.lugha", "match": "\\b(Some|None|Ok|Err)\\b" },
-        { "name": "support.type.lugha", "match": "\\b(Self|Option|Result|Ref|Task|Chan)\\b" }
+        { "name": "support.type.lugha", "match": "\\b(Self|Option|Result|Ref|Task|Chan|Sender|Receiver)\\b" }
       ]
     },
     "call": {
@@ -184,14 +189,6 @@
         { "include": "#braces" },
         { "include": "#code" }
       ]
-    },
-    "hashed": {
-      "comment": "`#{k: v}` and `#{x}`: map and set literals (v17).",
-      "begin": "#\\{",
-      "end": "\\}",
-      "beginCaptures": { "0": { "name": "punctuation.definition.map.begin.lugha" } },
-      "endCaptures": { "0": { "name": "punctuation.definition.map.end.lugha" } },
-      "patterns": [{ "include": "#braces" }, { "include": "#code" }]
     },
     "braces": {
       "begin": "\\{",

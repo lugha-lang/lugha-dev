@@ -1,0 +1,18 @@
+struct Countdown { n: i64 }
+
+impl Iter<i64> for Countdown {
+    fun next(mut self): Option<i64> {
+        if self.n == 0 {
+            return None;
+        }
+        self.n -= 1;
+        Some(self.n + 1)
+    }
+}
+
+fun main(console: Console) {
+    for n of (Countdown { n: 3 }) {
+        console.println(n);
+    }
+    console.println((Countdown { n: 5 }).filter(fun(n) = n % 2 == 1).collect().debug());
+}

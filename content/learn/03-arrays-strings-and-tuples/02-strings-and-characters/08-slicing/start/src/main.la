@@ -1,5 +1,6 @@
-fun main() {
+fun main(console: Console) {
     let name = "Zoë";
-    println(name.slice(0, 2));
-    println(name.slice(2, 4));
+    console.println(name.slice(0, 2));
+    console.println(name.slice(2, 4));
+    console.println(name.slice(0, 3).len);
 }

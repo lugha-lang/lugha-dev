@@ -1,5 +1,5 @@
-fun main() {
+fun main(console: Console) {
     let typed = "41";
     let n = parse_i64(typed);
-    println(n + 1);
+    console.println(n + 1);
 }

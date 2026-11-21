@@ -1,0 +1,6 @@
+fun square(n: i64): i64 = n * n;
+
+fun main(console: Console) {
+    let t = spawn square(7);
+    console.println(t.join().unwrap());
+}

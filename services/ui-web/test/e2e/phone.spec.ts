@@ -5,7 +5,7 @@ import { expect, test } from "@playwright/test";
 
 test.use({ viewport: { width: 390, height: 664 }, isMobile: true, hasTouch: true });
 
-const PAGES = ["/", "/learn/values/copies/mutable-copies/", "/learn/values/ref/ref-boxes/", "/examples/word-frequency/", "/playground"];
+const PAGES = ["/", "/learn/value-semantics/copies/mutable-copies/", "/learn/value-semantics/ref/ref-boxes/", "/examples/word-frequency/", "/playground"];
 
 for (const path of PAGES) {
   test(`${path} fits a phone's width`, async ({ page }) => {

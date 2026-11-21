@@ -1,0 +1,18 @@
+fun count(n: i64): i64 {
+    let mut sum = 0;
+    for i in 0..n {
+        sum += i;
+    }
+    sum
+}
+
+fun main(console: Console) {
+    let total = scope s {
+        let a = s.spawn(count(1_000));
+        let b = s.spawn(count(2_000));
+        console.println(a.join().debug());
+        console.println(b.join().debug());
+        a.join().unwrap() + b.join().unwrap()
+    };
+    console.println(total.debug());
+}

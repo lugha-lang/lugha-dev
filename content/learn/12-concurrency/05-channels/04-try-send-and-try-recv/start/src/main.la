@@ -1,0 +1,10 @@
+fun main(console: Console) {
+    let (tx, rx) = Chan<i64>.new(1);
+    console.println(tx.try_send(1).debug());
+    console.println(tx.try_send(2).debug());
+    console.println(rx.try_recv().debug());
+    console.println(rx.try_recv().debug());
+    tx.close();
+    console.println(tx.try_send(3).debug());
+    console.println(rx.try_recv().debug());
+}

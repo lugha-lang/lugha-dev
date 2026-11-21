@@ -2,8 +2,7 @@
 title: Integer overflow
 ---
 
-Only `as` wraps a whole number around.
-Arithmetic doesn't: when a result won't fit, the program stops instead.
+Arithmetic on whole numbers never wraps around the way `truncate` does: when a result won't fit, the program stops.
 `level` is a `u8` holding 250, so line 3 prints `255`, its largest value, and line 4 adds 10.
 Press Run.
 

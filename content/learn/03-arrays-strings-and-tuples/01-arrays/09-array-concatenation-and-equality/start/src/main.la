@@ -1,0 +1,7 @@
+fun main(console: Console) {
+    let first = [1, 2];
+    let second = [3];
+    let both = first + second;
+    console.println(both.debug());
+    console.println(both == [1, 2, 3]);
+}

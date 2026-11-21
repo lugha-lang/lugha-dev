@@ -9,5 +9,5 @@ Press Run.
 
 It prints `21`.
 `area` comes first here, but the order of functions in a file doesn't matter, so `main` could be at the top instead.
-The types are what matter: `lughac` works out a `let`'s type from its value, but never a parameter's type, and never a return type from the body.
-Leave the return type off, as `main` does on line 5, and the function gives back `()`.
+`lughac` works out a `let`'s type from its value, but a function's parameter types are always written, and so is its return type when it gives a value back.
+Leave the return type off, as `main` does on line 5, and the function gives back `()`, which means nothing.

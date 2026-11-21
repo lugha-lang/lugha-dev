@@ -30,7 +30,7 @@ describe("checkDiagram", () => {
   });
 
   it("passes the first diagram in the course", () => {
-    const file = join(import.meta.dirname, "../../../content/learn/05-values/02-ref/01-ref-boxes/diagram.svg");
+    const file = join(import.meta.dirname, "../../../content/learn/05-value-semantics/03-ref/01-ref-boxes/diagram.svg");
     expect(checkDiagram(readFileSync(file, "utf8")).ok).toBe(true);
   });
 

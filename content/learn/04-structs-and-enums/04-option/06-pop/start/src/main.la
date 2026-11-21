@@ -1,7 +1,7 @@
-fun main() {
+fun main(console: Console) {
     let mut stack = [1, 2];
-    println(stack.pop());
-    println(stack.pop());
-    println(stack.pop());
-    println(stack);
+    console.println(stack.pop().debug());
+    console.println(stack.pop().debug());
+    console.println(stack.pop().debug());
+    console.println(stack.debug());
 }

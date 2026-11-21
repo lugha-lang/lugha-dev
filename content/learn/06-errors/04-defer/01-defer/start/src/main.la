@@ -1,0 +1,6 @@
+fun main(console: Console) {
+    let mut n = 1;
+    defer console.println("deferred: n is {n}");
+    n = 2;
+    console.println("end of main: n is {n}");
+}

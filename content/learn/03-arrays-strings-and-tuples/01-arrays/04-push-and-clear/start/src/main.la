@@ -1,8 +1,0 @@
-fun main() {
-    let mut list = ["milk"];
-    list.push("bread");
-    println(list);
-    println(list.len);
-    list.clear();
-    println(list.len);
-}

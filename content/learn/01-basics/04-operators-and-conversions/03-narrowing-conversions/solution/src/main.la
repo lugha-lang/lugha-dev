@@ -1,0 +1,7 @@
+fun main(console: Console) {
+    let total = 300;
+    console.println(total.truncate<u8>());
+    console.println(total.round<f64>() / 7.0);
+    console.println(total.saturate<u8>());
+    console.println(total.try_into<u8>().is_some());
+}

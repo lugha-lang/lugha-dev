@@ -1,0 +1,11 @@
+fun bump(n: i64): i64 = n + 1;
+
+fun main(console: Console) {
+    let count = 0;
+    let r = scope s {
+        let a = s.spawn(bump(count));
+        let b = s.spawn(bump(count));
+        a.join().unwrap() + b.join().unwrap()
+    };
+    console.println(r.debug());
+}

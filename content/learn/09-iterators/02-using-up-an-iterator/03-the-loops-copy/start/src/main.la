@@ -1,0 +1,8 @@
+fun main(console: Console) {
+    let it = [1, 2, 3].iter();
+    for x of it {
+        console.println(x);
+    }
+    console.println(it.count());
+    console.println(it.take(1).collect().debug());
+}

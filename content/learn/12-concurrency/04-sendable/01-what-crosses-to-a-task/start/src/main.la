@@ -1,0 +1,17 @@
+struct Order { item: string, qty: i64 }
+
+fun ship(order: Order): string {
+    let mut copy = order;
+    copy.qty -= 1;
+    "{copy.item}: {copy.qty} left after shipping one"
+}
+
+fun main(console: Console) {
+    let order = Order { item: "tea", qty: 3 };
+    let r = scope s {
+        let t = s.spawn(ship(order));
+        t.join().unwrap()
+    };
+    console.println(r.debug());
+    console.println(order.qty);
+}

@@ -1,7 +1,7 @@
-fun main() {
-    println(1_000_000);
-    println(0xFF);
-    println(0b1010);
-    println(0o17);
-    println(017);
+fun main(console: Console) {
+    console.println(1_000_000);
+    console.println(0xFF);
+    console.println(0b1010);
+    console.println(0o17);
+    console.println(017);
 }

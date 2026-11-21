@@ -1,0 +1,6 @@
+fun main(console: Console, net: Net) {
+    match net.connect("example.com:80") {
+        .Ok(_) => console.println("connected"),
+        .Err(e) => console.println("can't connect: {e}"),
+    }
+}

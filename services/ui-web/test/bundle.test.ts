@@ -10,14 +10,14 @@ describe("the content bundle", async () => {
   const r = await loadContent(join(import.meta.dirname, "../../../content"), code);
   if (!r.ok) throw new Error(r.error.join("\n"));
   const { chapters, examples } = r.value;
-  const values = chapters.findIndex((c) => c.slug === "values");
+  const values = chapters.findIndex((c) => c.slug === "value-semantics");
 
   it("indexes chapters, lessons, steps and examples, with their URLs", () => {
     const i = index(chapters, examples);
     expect(i.v).toBe(1);
-    expect(i.chapters[values].lessons[0].url).toBe("/content/v1/lessons/values/copies.json");
+    expect(i.chapters[values].lessons[0].url).toBe("/content/v1/lessons/value-semantics/copies.json");
     expect(i.chapters[values].lessons[0].steps[1]).toEqual({
-      id: "values/copies/mutable-copies",
+      id: "value-semantics/copies/mutable-copies",
       title: "Mutable copies",
       kind: "fix",
     });
@@ -27,7 +27,7 @@ describe("the content bundle", async () => {
 
   it("gives a lesson's steps whole, without the site's own folder paths", () => {
     const l = lesson(chapters[values], chapters[values].lessons[0]);
-    expect(l.chapter).toEqual({ slug: "values", title: "Value semantics" });
+    expect(l.chapter).toEqual({ slug: "value-semantics", title: "Value semantics" });
     expect(l.steps[1]).toMatchObject({ startError: "E0501", solution: expect.any(String), expected: expect.any(String) });
     expect(l.steps.every((s) => !("path" in s))).toBe(true);
     expect(l.steps[1]).toMatchObject({ files: [{ path: "src/main.la", text: expect.any(String) }], solutionFiles: [{ path: "src/main.la" }], tests: false });

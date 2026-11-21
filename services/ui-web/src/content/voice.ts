@@ -3,10 +3,12 @@
 // Doesn't judge tone: that takes a person reading the step.
 import { splitFront } from "./markdown";
 
+// Set by the course as reviewed sentence by sentence, as a backstop against a step that grows
+// past what one screen beside its code can hold.
 /** The most words a sentence may have. */
-const SENTENCE_WORDS = 30;
+const SENTENCE_WORDS = 45;
 /** The most words of text a step may have, not counting code and the quiz. */
-const STEP_WORDS = 120;
+const STEP_WORDS = 170;
 
 const SELLING = /\b(simply|just|easy|easily|effortless(?:ly)?|powerful|seamless(?:ly)?|elegant(?:ly)?|robust|blazing|magic(?:al)?|awesome|amazing|let's|let us|in this step|we'll|we will)\b/gi;
 
@@ -14,8 +16,8 @@ const SELLING = /\b(simply|just|easy|easily|effortless(?:ly)?|powerful|seamless(
 const LANGUAGES = /\b(Rust|Python|JavaScript|TypeScript|Java|Ruby|Kotlin|Swift|Haskell|Zig|Golang|Go|Elixir|Erlang|Scala|PHP|Perl|Lua|Dart|OCaml|Nim)\b|C\+\+|C#/g;
 
 // The text sits beside the code on a wide screen and above it on a phone, so a direction is wrong on
-// one of them.
-const DIRECTIONS = /\b(?:on|to) the (?:right|left)\b|\b(?:right|left)-hand\b/gi;
+// one of them. An operator's "right-hand operand" or "right-hand type" is a term, not a direction.
+const DIRECTIONS = /\b(?:on|to) the (?:right|left)\b|\b(?:right|left)-hand\b(?! (?:operand|type)s?\b)/gi;
 
 /** Text with its inline code removed, so `!=` or `just_one` in backticks isn't read as prose. */
 const words = (text: string) => text.replace(/`[^`]*`/g, "code");

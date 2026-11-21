@@ -1,5 +1,5 @@
-fun main() {
+fun main(console: Console) {
     let name = "Zoë";
-    println(name.len);
-    println(name.char_count());
+    console.println(name.len);
+    console.println(name.char_count());
 }

@@ -1,0 +1,9 @@
+fun numbers(): i64[] {
+    let xs = [1, 2, 3];
+    xs
+}
+
+fun main(console: Console) {
+    let kept = numbers();
+    console.println(kept.debug());
+}

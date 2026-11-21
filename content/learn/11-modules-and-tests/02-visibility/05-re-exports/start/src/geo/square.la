@@ -1,0 +1,3 @@
+public struct Square { side: f64 }
+
+public fun area(s: Square): f64 = s.side * s.side;

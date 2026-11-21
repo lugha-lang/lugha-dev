@@ -1,0 +1,8 @@
+fun double(n: i64): i64 = n * 2;
+
+fun twice<F: fun(i64): i64>(f: F, x: i64): i64 = f(f(x));
+
+fun main(console: Console) {
+    console.println(twice(double, 5));
+    console.println(twice(fun(n: i64) = n + 1, 5));
+}

@@ -1,4 +1,4 @@
-fun main(): i32 {
-    println("checking the input");
+fun main(console: Console): i32 {
+    console.println("checking the input");
     0
 }

@@ -1,0 +1,17 @@
+actor Tally {
+    total: i64,
+
+    fun add(mut self, n: i64) {
+        self.total += n;
+    }
+
+    fun get(self): i64 = self.total;
+}
+
+fun main(console: Console) {
+    let r = scope s {
+        let t = s.spawn(Tally { total: 0 });
+        t.add(4);
+        console.println(t.get());
+    };
+}

@@ -1,0 +1,5 @@
+fun main(console: Console) {
+    defer console.println("cleaning up");
+    let ages = [30, 41];
+    console.println(ages[2]);
+}

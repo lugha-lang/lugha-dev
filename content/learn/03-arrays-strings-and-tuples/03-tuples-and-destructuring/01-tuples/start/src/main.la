@@ -1,6 +1,6 @@
-fun main() {
+fun main(console: Console) {
     let item = ("milk", 2);
-    println(item);
-    println(item.0);
-    println(item.1);
+    console.println(item.debug());
+    console.println(item.0);
+    console.println(item.1);
 }

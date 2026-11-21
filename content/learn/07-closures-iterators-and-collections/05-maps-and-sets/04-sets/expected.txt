@@ -1,7 +1,0 @@
-true
-true
-false
-true
-#{"red", "green"}
-Some(40)
-#{}

@@ -1,0 +1,10 @@
+fun count_lines(dir: ReadDir, path: string): Result<i64, string> {
+    let text = dir.read_file(path)?;
+    Ok(text.lines().len)
+}
+
+fun main(console: Console, fs: Fs) {
+    let dir = fs.cwd();
+    console.println(dir.write_file("list.txt", "milk\neggs\nbread\n").is_ok());
+    console.println(count_lines(dir.read_only(), "list.txt").debug());
+}

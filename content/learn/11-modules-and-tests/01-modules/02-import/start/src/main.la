@@ -1,0 +1,5 @@
+fun main(console: Console) {
+    let s = shapes.Square { side: 3.0 };
+    console.println(shapes.describe(s));
+    console.println(shapes.area(s));
+}

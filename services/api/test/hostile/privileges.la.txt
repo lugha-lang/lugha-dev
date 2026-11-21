@@ -6,13 +6,18 @@ extern fun getuid(): u32;
 extern fun chroot(path: string): i32;
 extern fun unshare(flags: i32): i32;
 
-fun main() {
-    println(setuid(0));
-    println(getuid());
-    println(chroot("/"));
+fun writes(fs: Fs, folder: string, name: string): bool = match fs.dir(folder) {
+    .Ok(d) => d.write_file(name, "x").is_ok(),
+    .Err(_) => false,
+};
+
+fun main(console: Console, fs: Fs) {
+    console.println(setuid(0));
+    console.println(getuid());
+    console.println(chroot("/"));
     // CLONE_NEWUSER
     let unshared = unshare(268435456);
-    println(write_file("/etc/lugha", "x").is_ok());
-    println(write_file("/usr/local/bin/runner", "x").is_ok());
-    eprintln("unshare gave {unshared}");
+    console.println(writes(fs, "/etc", "lugha"));
+    console.println(writes(fs, "/usr/local/bin", "runner"));
+    console.eprintln("unshare gave {unshared}");
 }

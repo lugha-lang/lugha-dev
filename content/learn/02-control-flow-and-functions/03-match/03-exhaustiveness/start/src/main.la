@@ -1,9 +1,9 @@
-fun main() {
+fun main(console: Console) {
     let command = "stop";
     let speed = match command {
         "go" => 10,
         "slow" => 3,
         "stop" => 0,
     };
-    println(speed);
+    console.println(speed);
 }

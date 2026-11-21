@@ -1,5 +1,5 @@
-title = "Green threads"
+title = "Tasks"
 group = "Concurrency"
 order = 1
-intro = "Run two calls at the same time and add up their results, with no async and no await."
-tags = ["spawn", "join"]
+intro = "Run two calls at the same time and add up their results."
+tags = ["scope", "spawn", "join"]

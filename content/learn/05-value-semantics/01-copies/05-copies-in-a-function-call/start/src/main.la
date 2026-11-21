@@ -1,0 +1,12 @@
+fun add_one(xs: i64[]): i64[] {
+    let mut ys = xs;
+    ys.push(1);
+    ys
+}
+
+fun main(console: Console) {
+    let xs = [5, 6];
+    let zs = add_one(xs);
+    console.println(xs.debug());
+    console.println(zs.debug());
+}

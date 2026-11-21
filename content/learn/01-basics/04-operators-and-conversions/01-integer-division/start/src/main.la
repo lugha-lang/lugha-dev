@@ -1,6 +1,6 @@
-fun main() {
-    println(7 / 2);
-    println(-7 / 2);
-    println(-7 % 2);
-    println(7.0 / 2.0);
+fun main(console: Console) {
+    console.println(7 / 2);
+    console.println(-7 / 2);
+    console.println(-7 % 2);
+    console.println(7.0 / 2.0);
 }

@@ -1,0 +1,11 @@
+fun check_age(age: i64): Result<(), string> {
+    if age < 0 || age > 130 {
+        return Err("{age} is not an age");
+    }
+    Ok(())
+}
+
+fun main(console: Console) {
+    check_age(150);
+    console.println("checked");
+}

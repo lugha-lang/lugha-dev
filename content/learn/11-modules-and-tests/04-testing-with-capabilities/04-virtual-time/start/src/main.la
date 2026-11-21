@@ -1,0 +1,11 @@
+import std.task;
+
+fun main(console: Console) {
+    console.println("see the test");
+}
+
+@test
+fun ten_seconds_of_sleep() {
+    task.sleep(10_000);
+    assert(true);
+}

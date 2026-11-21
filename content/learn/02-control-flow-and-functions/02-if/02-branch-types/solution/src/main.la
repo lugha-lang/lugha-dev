@@ -1,9 +1,9 @@
-fun main() {
+fun main(console: Console) {
     let temperature = 31;
     let advice = if temperature > 30 {
         "stay inside"
     } else {
         "go out"
     };
-    println(advice);
+    console.println(advice);
 }

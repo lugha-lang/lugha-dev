@@ -1,0 +1,6 @@
+starting 10 / 2
+finished 10 / 2
+Ok(5)
+starting 10 / 0
+finished 10 / 0
+Err("division by zero")

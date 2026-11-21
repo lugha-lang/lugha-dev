@@ -1,0 +1,11 @@
+fun main(args: string[], console: Console): i32 {
+    console.println(args.len);
+    if args.len < 2 {
+        console.println("usage: greet NAME");
+        return 1;
+    }
+    for name of args.iter().skip(1) {
+        console.println("hello, {name}");
+    }
+    0
+}

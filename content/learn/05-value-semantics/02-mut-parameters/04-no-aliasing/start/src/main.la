@@ -1,0 +1,11 @@
+struct Counter { n: i64 }
+
+fun add_to(mut total: Counter, other: Counter) {
+    total.n += other.n;
+}
+
+fun main(console: Console) {
+    let mut c = Counter { n: 4 };
+    add_to(mut c, c);
+    console.println(c.n);
+}

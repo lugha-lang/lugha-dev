@@ -3,7 +3,7 @@
 // would, and must print what its expected.txt says. A step with a solution
 // is checked both ways: the start code gives its start_error (or prints its
 // start_output), and the solution prints expected.txt. A step runs with every
-// file under its start/ (or solution/), its own lugha.toml included. A step with test/ files is a test
+// file under its start/ (or solution/), its own lugha.toml included. A step with tests (test/ files, or an @test anywhere) is a test
 // step: its solution's tests must all pass, and a start with start_failing
 // must fail exactly those tests.
 //
@@ -43,7 +43,7 @@ fun setup(env: Env, fs: Fs, proc: Proc, net: Net, clock: Clock, entropy: Entropy
     if env.get("SANDBOX_TESTS") != Some("1") {
         return None;
     }
-    let image = env.get("SANDBOX_IMAGE").unwrap_or("lugha-sandbox:m159");
+    let image = env.get("SANDBOX_IMAGE").unwrap_or("lugha-sandbox:m240");
     let has_runsc = match proc.run("docker", ["info", "--format", "{{{{json .Runtimes}}}}"]) {
         .Ok(out) => out.stdout.contains("\"runsc\""),
         .Err(_) => false,
@@ -219,6 +219,13 @@ fun front(md: string, key: string): string {
     ""
 }
 
+/** Whether a project has tests: a file under `test/`, or a line starting `@test` in any file. */
+fun has_tests(sources: File[]): bool = sources.any(
+    fun(f) = f.path.starts_with("test/") || f.text.split("\n").any(
+        fun(l) = l.trim().starts_with("@test"),
+    ),
+);
+
 /** Compares what ran with what was expected, adding a line to `problems` when they differ. */
 fun check(
     problems: string[],
@@ -273,7 +280,7 @@ fun every_lesson_step_prints_what_it_says(
                     "every step has expected.txt",
                 );
                 let start = project(c, "{dir}/start");
-                let tests = start.any(fun(f) = f.path.starts_with("test/"));
+                let tests = has_tests(start);
                 steps += 1;
                 if c.is_dir("{dir}/solution") {
                     let solution = project(c, "{dir}/solution");
@@ -389,4 +396,27 @@ fun home_and_playground_programs_print_what_they_say(
         console.eprintln(p);
     }
     assert_eq(problems, []);
+}
+
+@test
+fun a_test_file_makes_tests() {
+    assert(has_tests([File { path: "test/area.la", text: "" }]));
+}
+
+@test
+fun an_at_test_in_src_makes_tests() {
+    assert(
+        has_tests([
+            File { path: "src/main.la", text: "fun main() {{}}\n\n@test\nfun works() {{}}\n" },
+        ]),
+    );
+}
+
+@test
+fun no_at_test_makes_no_tests() {
+    assert(
+        !has_tests([
+            File { path: "src/main.la", text: "// @test in a comment\nfun main() {{}}\n" },
+        ]),
+    );
 }

@@ -1,0 +1,6 @@
+Sent
+Full(2)
+Ready(1)
+Empty
+Closed(3)
+Closed

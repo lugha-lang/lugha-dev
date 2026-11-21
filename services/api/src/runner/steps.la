@@ -61,6 +61,11 @@ fun run_command(args: string[]): Command = timed(
         "--nproc={RUN_PROCESSES}",
         "--fsize={SCRATCH_MB * MB}",
         "--",
+        // One worker thread, as on a one-CPU machine, so a program's tasks
+        // interleave the same way wherever it runs. `env` reads nothing
+        // after the program's name, so the visitor's arguments pass through.
+        "env",
+        "LUGHA_WORKERS=1",
         PROGRAM,
     ] + args,
 );

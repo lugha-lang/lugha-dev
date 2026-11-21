@@ -1,0 +1,22 @@
+import std.task;
+
+fun worker(console: Console): i64 {
+    defer console.println("worker cleans up");
+    task.sleep(2_000);
+    console.println("worker finished");
+    1
+}
+
+fun check(n: i64): Result<i64, string> {
+    task.sleep(100);
+    if n < 0 { Err("negative: {n}") } else { Ok(n) }
+}
+
+fun main(console: Console) {
+    let r = scope s {
+        s.spawn(worker(console));
+        s.spawn(check(-1));
+        console.println("body waits");
+    };
+    console.println(r.is_err());
+}

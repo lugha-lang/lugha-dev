@@ -1,6 +1,6 @@
-fun main() {
+fun main(console: Console) {
     let name = "Amina";
     let points = 7;
     let line = name + " has " + points;
-    println(line);
+    console.println(line);
 }

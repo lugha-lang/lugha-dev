@@ -1,0 +1,15 @@
+fun main(console: Console) {
+    for n of range(1, 4) {
+        console.println(n);
+    }
+    for c of "hé".chars() {
+        console.println(c);
+    }
+    for b of "hé".bytes() {
+        console.println(b);
+    }
+    let it = [10, 20].iter();
+    for x of it {
+        console.println(x);
+    }
+}

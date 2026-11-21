@@ -1,0 +1,14 @@
+fun greeting(env: Env): string {
+    match env.get("USER") {
+        .Some(name) => "hello, {name}",
+        .None => "hello, whoever you are",
+    }
+}
+
+fun main(console: Console, env: Env) {
+    console.println(env.get("PATH").is_some());
+    console.println(env.get("NO_SUCH_VARIABLE").debug());
+    console.println(greeting(env));
+    let narrow = env.only(["HOME"]);
+    console.println(narrow.get("PATH").debug());
+}

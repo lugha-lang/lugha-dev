@@ -4,10 +4,10 @@ enum Shape {
     Empty,
 }
 
-fun main() {
+fun main(console: Console) {
     let wheel = Shape::Circle(2.0);
     let door = Shape.Rect(1.0, 2.0);
-    println(wheel);
-    println(door);
-    println(Shape.Empty);
+    console.println(wheel.debug());
+    console.println(door.debug());
+    console.println(Shape.Empty.debug());
 }

@@ -1,0 +1,7 @@
+fun main(console: Console) {
+    let ages = Map { "ann": 31, "bo": 40 };
+    console.println(ages.get("ann").debug());
+    console.println(ages.get("dee").debug());
+    console.println(ages.has("dee"));
+    console.println(ages["dee"]);
+}

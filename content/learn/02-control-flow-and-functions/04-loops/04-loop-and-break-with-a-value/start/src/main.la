@@ -1,4 +1,4 @@
-fun main() {
+fun main(console: Console) {
     let mut n = 1;
     let first = loop {
         n = n * 2;
@@ -6,5 +6,5 @@ fun main() {
             break n;
         }
     };
-    println(first);
+    console.println(first);
 }

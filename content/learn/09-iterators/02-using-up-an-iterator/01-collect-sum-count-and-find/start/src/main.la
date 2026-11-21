@@ -1,0 +1,10 @@
+fun main(console: Console) {
+    let scores = [7, 3, 9, 4].iter();
+    console.println(scores.sum());
+    console.println(scores.count());
+    console.println(scores.find(fun(s) = s > 8).debug());
+    console.println(scores.min().debug());
+    console.println(scores.max().debug());
+    console.println(scores.position(fun(s) = s == 9).debug());
+    console.println(scores.filter(fun(s) = s > 5).collect().debug());
+}

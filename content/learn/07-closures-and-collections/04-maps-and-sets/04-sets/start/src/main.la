@@ -1,0 +1,12 @@
+fun main(console: Console) {
+    let mut seen = Set { "red", "blue" };
+    console.println(seen.has("red"));
+    console.println(seen.insert("green"));
+    console.println(seen.insert("red"));
+    console.println(seen.remove("blue"));
+    console.println(seen.debug());
+    let mut ages = Map { "ann": 31, "bo": 40 };
+    console.println(ages.remove("bo").debug());
+    ages.clear();
+    console.println(ages.debug());
+}

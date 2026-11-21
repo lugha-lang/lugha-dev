@@ -44,6 +44,16 @@ export function kept(store: Store) {
     setProgress(p: Progress) {
       store.set("progress", p);
     },
+    /**
+     * Clears progress and every step's edits kept for another shape of the course, once: step ids
+     * may be the same in two courses while their code is not. The Playground's project stays.
+     */
+    forCourse(version: number) {
+      if (store.get("course") === version) return;
+      store.removeStarting("step.");
+      store.remove("progress");
+      store.set("course", version);
+    },
     /** Clears progress and puts every step in `steps` back to its start. */
     startOver(steps: string[]) {
       store.set("progress", startOver());

@@ -1,7 +1,8 @@
-// Every copy forks forever: the process limits must hold it.
+// Every copy forks forever: the process limits must hold it. It takes `Proc`,
+// as an attacker would, so the language's own lockdown doesn't stop the forks.
 extern fun fork(): i32;
 
-fun main() {
+fun main(proc: Proc) {
     loop {
         fork();
     }

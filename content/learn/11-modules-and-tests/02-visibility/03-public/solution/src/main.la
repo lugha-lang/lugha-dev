@@ -1,0 +1,6 @@
+import shapes;
+
+fun main(console: Console) {
+    let s = shapes.unit();
+    console.println(s.side);
+}

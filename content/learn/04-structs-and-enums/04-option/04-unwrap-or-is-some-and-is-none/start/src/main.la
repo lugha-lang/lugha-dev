@@ -7,10 +7,10 @@ fun find(names: string[], wanted: string): Option<i64> {
     None
 }
 
-fun main() {
+fun main(console: Console) {
     let names = ["Ann", "Ben", "Cy"];
-    println(find(names, "Dee").is_none());
-    println(find(names, "Ben").is_some());
-    println(find(names, "Ben").unwrap_or(-1));
-    println(find(names, "Dee").unwrap_or(-1));
+    console.println(find(names, "Dee").is_none());
+    console.println(find(names, "Ben").is_some());
+    console.println(find(names, "Ben").unwrap_or(-1));
+    console.println(find(names, "Dee").unwrap_or(-1));
 }

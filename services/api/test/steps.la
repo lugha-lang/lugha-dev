@@ -40,6 +40,8 @@ fun running_is_timed_and_limited() {
             "--nproc=16",
             "--fsize=16777216",
             "--",
+            "env",
+            "LUGHA_WORKERS=1",
             PROGRAM,
             "21",
             "--verbose",
@@ -56,10 +58,21 @@ fun the_program_lives_where_no_sent_file_can() {
 
 @test
 fun an_argument_like_a_flag_reaches_the_program() {
-    // After "--", prlimit passes everything on unread.
-    let c = run_command(["--as=0"]);
-    assert_eq(c.args[c.args.len - 1], "--as=0");
-    assert_eq(c.args[c.args.len - 3], "--");
+    // After "--", prlimit passes everything on unread, and env reads
+    // nothing after the program's name.
+    let c = run_command(["--as=0", "-i"]);
+    let n = c.args.len;
+    assert_eq(
+        [c.args[n - 6], c.args[n - 5], c.args[n - 4], c.args[n - 3], c.args[n - 2], c.args[n - 1]],
+        ["--", "env", "LUGHA_WORKERS=1", PROGRAM, "--as=0", "-i"],
+    );
+}
+
+@test
+fun an_argument_like_a_setting_reaches_the_program() {
+    let c = run_command(["LUGHA_WORKERS=8"]);
+    assert_eq(c.args[c.args.len - 2], PROGRAM);
+    assert_eq(c.args[c.args.len - 1], "LUGHA_WORKERS=8");
 }
 
 @test

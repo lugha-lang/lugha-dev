@@ -1,0 +1,18 @@
+interface Named {
+    fun name(self): string;
+}
+
+interface Pet: Named {
+    fun sound(self): string;
+}
+
+struct Dog {}
+
+impl Pet for Dog {
+    fun sound(self): string = "woof";
+}
+
+fun main(console: Console) {
+    let d = Dog {};
+    console.println("the {d.name()} says {d.sound()}");
+}

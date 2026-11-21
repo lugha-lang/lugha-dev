@@ -1,0 +1,9 @@
+fun main(console: Console, proc: Proc) {
+    let out = proc.run("echo", ["hello", "$HOME; rm -rf /"]).unwrap();
+    console.println("{out.code} {out.stdout.trim()}");
+    let sorted = proc.run_with("sort", [], "pear\napple\n").unwrap();
+    console.println(sorted.stdout.lines().join(","));
+    let failed = proc.run("sh", ["-c", "exit 3"]).unwrap();
+    console.println(failed.code);
+    console.println(proc.run("no-such-program-x", []).debug());
+}

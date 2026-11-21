@@ -1,35 +1,13 @@
 ---
 title: Matching on enums
-start_error: E0417
+start_error: E0212
 ---
 
-To use a variant's data, `match` on the value.
-In an arm, a variant is written without the enum's name.
-Names in its parentheses take its data, so `Circle(r)` on line 9 gives the radius the name `r`.
-`main` never passes an empty shape to `area`, and the `match` has no arm for `Empty`.
+A `match` reaches a variant's data: names in its parentheses are given the data, so `Circle(r)` on line 9 names the radius `r`.
+Press Run.
 
-`lughac` refuses it with E0417, "non-exhaustive match: `Empty` not covered".
-A `match` on an enum must cover every variant, whatever the program happens to pass it:
-
-```lugha {11}
-enum Shape {
-    Circle(f64),
-    Rect(f64, f64),
-    Empty,
-}
-
-fun area(s: Shape): f64 {
-    match s {
-        Circle(r) => 3.14 * r * r,
-        Rect(w, h) => w * h,
-        Empty => 0.0,
-    }
-}
-
-fun main() {
-    println(area(Shape.Circle(2.0)));
-    println(area(Shape.Rect(1.0, 2.0)));
-}
-```
-
-Add the `Empty` arm as line 11.
+E0212 on lines 9 and 10 says a variant in a pattern takes a leading dot, `.Circle(r)`, with no enum name before it.
+A name without a dot is a new variable that matches anything, like `t` in the match lesson, so line 11's `Empty` isn't flagged yet.
+Put a `.` before `Circle`, `Rect` and `Empty` on lines 9 to 11, or press Solve.
+Fix only lines 9 and 10, and line 11 gets E0468: a bare name that is one of `Shape`'s variants needs its dot.
+The arms must cover every variant too: without `.Empty`, E0417 says "`.Empty` not covered".

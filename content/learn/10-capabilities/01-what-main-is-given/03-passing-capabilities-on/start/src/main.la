@@ -1,0 +1,10 @@
+fun timed(console: Console, clock: Clock, label: string) {
+    let start = clock.monotonic_ms();
+    console.println("working on {label}");
+    let took = clock.monotonic_ms() - start;
+    console.println(took >= 0);
+}
+
+fun main(console: Console, clock: Clock) {
+    timed(console, clock, "the report");
+}

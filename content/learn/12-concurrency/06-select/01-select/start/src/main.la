@@ -1,0 +1,25 @@
+import std.task;
+
+fun send_late(out: Sender<string>, words: string[], first: i64) {
+    task.sleep(first);
+    for w of words {
+        out.send(w);
+        task.sleep(200);
+    }
+}
+
+fun main(console: Console) {
+    let (fruit_tx, fruit) = Chan<string>.new(0);
+    let (tools_tx, tools) = Chan<string>.new(0);
+    let r = scope s {
+        s.spawn(send_late(fruit_tx, ["apple", "pear"], 100));
+        s.spawn(send_late(tools_tx, ["saw", "drill"], 200));
+        for i in 0..4 {
+            select {
+                f = fruit.recv() => console.println("fruit: {f.unwrap()}"),
+                t = tools.recv() => console.println("tool: {t.unwrap()}"),
+            }
+        }
+    };
+    console.println(r.debug());
+}

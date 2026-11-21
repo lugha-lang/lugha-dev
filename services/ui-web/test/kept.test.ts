@@ -6,7 +6,15 @@ import { projectOf } from "../src/lib/project";
 
 function memory() {
   const data = new Map<string, string>();
-  return makeStore({ getItem: (k) => data.get(k) ?? null, setItem: (k, v) => void data.set(k, v), removeItem: (k) => void data.delete(k) });
+  return makeStore({
+    getItem: (k) => data.get(k) ?? null,
+    setItem: (k, v) => void data.set(k, v),
+    removeItem: (k) => void data.delete(k),
+    get length() {
+      return data.size;
+    },
+    key: (i) => [...data.keys()][i] ?? null,
+  });
 }
 
 describe("what the browser keeps", () => {
@@ -44,6 +52,21 @@ describe("what the browser keeps", () => {
     expect(k.stepFiles("a/b/d", two)).toEqual([{ path: "src/main.la", text: "old main" }, two[1]]);
     store.set("step.a/b/d", [{ path: "src/other.la", text: "?" }]);
     expect(k.stepFiles("a/b/d", two)).toEqual(two);
+  });
+
+  it("clears progress and step edits kept for another course, once, and keeps the Playground", () => {
+    const k = kept(memory());
+    const project = projectOf("old");
+    k.setProgress({ done: ["a/b/c"] });
+    k.setStepFiles("a/b/c", [{ path: "src/main.la", text: "x" }], one);
+    k.setPlayground(project);
+    k.forCourse(2);
+    expect(k.progress()).toEqual({ done: [] });
+    expect(k.stepFiles("a/b/c", one)).toEqual(one);
+    expect(k.playground(projectOf("new"))).toEqual(project);
+    k.setProgress({ done: ["a/b/c"] });
+    k.forCourse(2);
+    expect(k.progress()).toEqual({ done: ["a/b/c"] });
   });
 
   it("keeps progress, and clears it on Start over with every step's edits", () => {

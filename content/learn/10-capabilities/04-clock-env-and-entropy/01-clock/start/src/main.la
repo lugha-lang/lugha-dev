@@ -1,0 +1,12 @@
+fun main(console: Console, clock: Clock) {
+    let now = clock.now_ms();
+    console.println(now > 1700000000000);
+    let start = clock.monotonic_ms();
+    let mut total = 0;
+    for i in 0..1000000 {
+        total += i % 7;
+    }
+    let took = clock.monotonic_ms() - start;
+    console.println(total);
+    console.println(took >= 0);
+}

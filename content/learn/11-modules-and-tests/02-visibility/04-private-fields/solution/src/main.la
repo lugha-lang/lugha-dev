@@ -1,0 +1,6 @@
+import range;
+
+fun main(console: Console) {
+    let r = range.Range.new(5, 1);
+    console.println(r.size());
+}

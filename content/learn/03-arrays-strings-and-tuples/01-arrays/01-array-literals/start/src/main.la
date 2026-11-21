@@ -1,7 +1,6 @@
-fun main() {
+fun main(console: Console) {
     let scores = [70, 85, 90];
     let zeros = [0; 4];
-    println(scores);
-    println(zeros);
-    println(scores.len);
+    console.println(scores.len);
+    console.println(zeros.len);
 }

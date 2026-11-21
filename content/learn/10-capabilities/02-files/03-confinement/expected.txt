@@ -1,0 +1,4 @@
+Err("path leads outside the folder")
+Err("path leads outside the folder")
+true
+Ok(2)

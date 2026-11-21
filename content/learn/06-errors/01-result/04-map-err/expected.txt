@@ -1,0 +1,2 @@
+Err("division by zero")
+Err("couldn't divide 10 by 0: division by zero")

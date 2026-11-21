@@ -1,0 +1,24 @@
+import std.task;
+
+fun slow(out: Sender<string>) {
+    task.sleep(500);
+    out.send("done");
+}
+
+fun main(console: Console) {
+    let (tx, rx) = Chan<string>.new(1);
+    let r = scope s {
+        s.spawn(slow(tx));
+        let mut waiting = true;
+        while waiting {
+            select {
+                m = rx.recv() => {
+                    console.println(m.unwrap());
+                    waiting = false;
+                },
+                after(200) => console.println("still waiting"),
+            }
+        }
+    };
+    console.println(r.debug());
+}

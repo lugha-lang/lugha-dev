@@ -1,9 +1,8 @@
 // Reaches for the internet, by name and by address: there is no network.
 import std.http;
-import std.net;
 
-fun main() {
-    println(http.get("http://example.com/").is_ok());
-    println(net.connect_timeout("1.1.1.1:53", 2000).is_ok());
-    println(net.resolve("example.com").is_ok());
+fun main(console: Console, net: Net) {
+    console.println(http.get(net, "http://example.com/").is_ok());
+    console.println(net.connect_timeout("1.1.1.1:53", 2000).is_ok());
+    console.println(net.resolve("example.com").is_ok());
 }

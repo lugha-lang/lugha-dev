@@ -1,0 +1,7 @@
+true
+true
+false
+true
+Set { "red", "green" }
+Some(40)
+Map {}

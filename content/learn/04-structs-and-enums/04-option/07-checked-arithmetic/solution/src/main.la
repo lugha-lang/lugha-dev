@@ -1,5 +1,5 @@
-fun main() {
+fun main(console: Console) {
     let level: u8 = 250;
-    println(level.checked_add(5));
-    println(level.checked_add(10));
+    console.println(level.checked_add(5).debug());
+    console.println(level.checked_add(10).debug());
 }

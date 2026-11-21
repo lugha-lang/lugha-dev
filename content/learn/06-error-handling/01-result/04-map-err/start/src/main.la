@@ -1,7 +1,0 @@
-fun explain(e: string): string = "couldn't read notes.txt: {e}";
-
-fun main() {
-    let read = read_file("notes.txt");
-    println(read);
-    println(read.map_err(explain));
-}

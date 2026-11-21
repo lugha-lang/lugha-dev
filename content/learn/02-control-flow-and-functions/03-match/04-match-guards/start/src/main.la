@@ -1,9 +1,9 @@
-fun main() {
+fun main(console: Console) {
     let temperature = -4;
     let advice = match temperature {
         0 => "exactly zero",
-        _ if temperature < 0 => "below zero",
-        _ if temperature > 0 => "above zero",
+        t if t < 0 => "below zero",
+        t if t > 0 => "above zero",
     };
-    println(advice);
+    console.println(advice);
 }

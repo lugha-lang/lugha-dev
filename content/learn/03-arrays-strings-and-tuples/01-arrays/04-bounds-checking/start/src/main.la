@@ -1,0 +1,5 @@
+fun main(console: Console) {
+    let scores = [70, 85, 90];
+    console.println(scores[0]);
+    console.println(scores[scores.len]);
+}

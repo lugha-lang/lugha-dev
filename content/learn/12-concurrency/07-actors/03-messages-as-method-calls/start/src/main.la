@@ -1,0 +1,25 @@
+import std.task;
+
+actor Logger {
+    lines: string[],
+
+    fun log(mut self, s: string) {
+        task.sleep(300);
+        self.lines.push(s);
+    }
+
+    fun all(self): string[] = self.lines;
+}
+
+fun main(console: Console, clock: Clock) {
+    let r = scope s {
+        let l = s.spawn(Logger { lines: [] });
+        let start = clock.monotonic_ms();
+        l.log("first");
+        l.log("second");
+        console.println(clock.monotonic_ms() - start < 300);
+        console.println(l.all().debug());
+        console.println(clock.monotonic_ms() - start >= 600);
+    };
+    console.println(r.debug());
+}

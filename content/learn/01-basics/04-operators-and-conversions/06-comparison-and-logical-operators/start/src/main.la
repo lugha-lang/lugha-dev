@@ -1,0 +1,6 @@
+fun main(console: Console) {
+    let age = 30;
+    let member = false;
+    console.println(18 <= age < 65);
+    console.println(!member || age > 60);
+}

@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { expect, test } from "@playwright/test";
 
 const content = (p: string) => readFileSync(new URL(`../../../../content/${p}`, import.meta.url), "utf8");
-const chapter = "learn/09-modules-and-tests";
+const chapter = "learn/11-modules-and-tests";
 const current = '.bar .dots a[aria-current="step"]';
 
 test("a step with several files lists them all and runs across them", async ({ page }) => {

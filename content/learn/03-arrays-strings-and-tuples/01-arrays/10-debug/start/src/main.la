@@ -1,0 +1,5 @@
+fun main(console: Console) {
+    let price = 10;
+    let total = debug(price * 3) + 1;
+    console.println(total);
+}

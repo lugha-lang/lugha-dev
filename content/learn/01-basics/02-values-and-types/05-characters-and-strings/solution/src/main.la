@@ -1,5 +1,6 @@
-fun main() {
-    println('a');
-    println("tab:\tend");
-    println("first line\nsecond line");
+fun main(console: Console) {
+    console.println('a');
+    console.println('\u{e9}');
+    console.println("tab:\tend, caf\u{e9}");
+    console.println("first line\nsecond line");
 }

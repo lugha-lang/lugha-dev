@@ -1,9 +1,19 @@
 // Writes and reads outside its folder: only /work and /tmp are writable,
 // and nothing of the host's is there.
-fun main() {
-    println(write_file("/etc/lugha", "x").is_ok());
-    println(write_file("/usr/local/bin/runner", "x").is_ok());
-    println(write_file("/opt/lugha-cache/objects/x", "x").is_ok());
-    println(write_file("/work/inside", "x").is_ok());
-    println(read_file("/var/run/docker.sock").is_ok());
+fun writes(fs: Fs, folder: string, name: string): bool = match fs.dir(folder) {
+    .Ok(d) => d.write_file(name, "x").is_ok(),
+    .Err(_) => false,
+};
+
+fun reads(fs: Fs, folder: string, name: string): bool = match fs.dir(folder) {
+    .Ok(d) => d.read_file(name).is_ok(),
+    .Err(_) => false,
+};
+
+fun main(console: Console, fs: Fs) {
+    console.println(writes(fs, "/etc", "lugha"));
+    console.println(writes(fs, "/usr/local/bin", "runner"));
+    console.println(writes(fs, "/opt/lugha-cache/objects", "x"));
+    console.println(writes(fs, "/work", "inside"));
+    console.println(reads(fs, "/var/run", "docker.sock"));
 }

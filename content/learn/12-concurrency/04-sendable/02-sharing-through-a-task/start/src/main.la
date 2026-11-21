@@ -1,0 +1,12 @@
+fun bump(count: Ref<i64>) {
+    count.update(fun(n) = n + 1);
+}
+
+fun main(console: Console) {
+    let count = Ref.new(0);
+    let r = scope s {
+        s.spawn(bump(count));
+        s.spawn(bump(count));
+    };
+    console.println(count.get());
+}

@@ -6,7 +6,7 @@ export const copy = {
   headline: "A language that doesn't get in your way, but still has your back.",
   nav: { learn: "Learn", examples: "Examples", playground: "Playground", github: "GitHub", home: "Lugha home" },
   home: { start: "Start learning", examples: "Examples", playground: "Playground", card: "fib.la" },
-  footer: (version: string) => [version, "Lugha v17", "Free software, GPL-3.0"],
+  footer: (version: string) => [version, "Lugha v18", "Free software, GPL-3.0"],
 
   run: "Run",
   running: "Running…",
@@ -23,9 +23,10 @@ export const copy = {
   tests: "Tests",
   input: "Input",
   arguments: "Arguments",
-  argumentsHelp: ["Passed after ", "--", "; read them with ", "args()", "."],
+  // The help lines alternate plain text and code: every second part is shown as code.
+  argumentsHelp: ["Passed after ", "--", "; ", "main", " takes them as ", "args: string[]", "."],
   stdin: "Standard input",
-  stdinHelp: ["What ", "read_line()", " reads, one line at a time."],
+  stdinHelp: ["What ", "console.read_line()", " reads, one line at a time."],
   format: "Format",
   test: "Test",
   share: "Share",

@@ -1,4 +1,4 @@
-fun main() {
-    println("one");
-    println("two");
+fun main(console: Console) {
+    console.println("one");
+    console.println("two");
 }

@@ -1,0 +1,9 @@
+fun close(console: Console, name: string): Result<(), string> {
+    console.println("closing {name}");
+    Ok(())
+}
+
+fun main(console: Console) {
+    defer close(console, "notes");
+    console.println("working");
+}

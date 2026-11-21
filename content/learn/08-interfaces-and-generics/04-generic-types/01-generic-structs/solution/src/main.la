@@ -1,0 +1,10 @@
+struct Pair<T> { left: T, right: T }
+
+fun swap_pair<T>(p: Pair<T>): Pair<T> = Pair { left: p.right, right: p.left };
+
+fun main(console: Console) {
+    let numbers = Pair { left: 1, right: 2 };
+    let words = Pair { left: "tea", right: "milk" };
+    console.println(swap_pair(numbers).debug());
+    console.println(swap_pair(words).debug());
+}

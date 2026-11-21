@@ -1,0 +1,2 @@
+Ok("tea: 2 left after shipping one")
+3

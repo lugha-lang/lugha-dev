@@ -1,0 +1,10 @@
+fun main(console: Console) {
+    let mut prices = Map { "tea": 3, "milk": 2 };
+    for item of prices.keys() {
+        prices[item] *= 2;
+    }
+    for (item, price) of prices {
+        console.println("{item}: {price}");
+    }
+    console.println(prices.values().debug());
+}

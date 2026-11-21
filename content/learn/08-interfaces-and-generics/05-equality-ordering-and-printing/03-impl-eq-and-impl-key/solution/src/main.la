@@ -1,0 +1,18 @@
+struct User { id: i64, name: string }
+
+impl Eq for User {
+    fun eq(self, other: User): bool = self.id == other.id;
+}
+
+impl Key for User {
+    fun hash(self, mut h: Hasher) {
+        h.add(self.id);
+    }
+}
+
+fun main(console: Console) {
+    let a = User { id: 7, name: "Ann" };
+    let b = User { id: 7, name: "Ann B." };
+    console.println(a == b);
+    console.println(Set { a, b }.len);
+}

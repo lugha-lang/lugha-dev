@@ -1,9 +1,9 @@
-fun main() {
+fun main(console: Console) {
     let line = "  milk,bread,eggs  ";
     let items = line.trim().split(",");
-    println(items);
-    println(items.join(" + "));
-    println(line.contains("bread"));
-    println(line.trim().starts_with("milk"));
-    println("one\ntwo".lines());
+    console.println(items.debug());
+    console.println(items.join(" + "));
+    console.println(line.contains("bread"));
+    console.println(line.trim().starts_with("milk"));
+    console.println("one\ntwo".lines().debug());
 }

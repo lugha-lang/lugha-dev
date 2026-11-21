@@ -1,0 +1,9 @@
+fun square(n: i64): i64 = n * n;
+
+fun main(console: Console) {
+    let r = scope s {
+        let ts = [s.spawn(square(2)), s.spawn(square(3))];
+        ts[0].join().unwrap() + ts[1].join().unwrap()
+    };
+    console.println(r.debug());
+}

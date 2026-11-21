@@ -143,12 +143,12 @@
       {:else}
         <label class="field">
           <span class="name">{copy.arguments}</span>
-          <span class="help">{copy.argumentsHelp[0]}<code>{copy.argumentsHelp[1]}</code>{copy.argumentsHelp[2]}<code>{copy.argumentsHelp[3]}</code>{copy.argumentsHelp[4]}</span>
+          <span class="help">{#each copy.argumentsHelp as part, i (i)}{#if i % 2}<code>{part}</code>{:else}{part}{/if}{/each}</span>
           <input type="text" value={project.args.join(" ")} oninput={(e) => onchange({ ...project, args: e.currentTarget.value.split(/\s+/).filter((a) => a !== "") })} />
         </label>
         <label class="field">
           <span class="name">{copy.stdin}</span>
-          <span class="help">{copy.stdinHelp[0]}<code>{copy.stdinHelp[1]}</code>{copy.stdinHelp[2]}</span>
+          <span class="help">{#each copy.stdinHelp as part, i (i)}{#if i % 2}<code>{part}</code>{:else}{part}{/if}{/each}</span>
           <textarea rows="6" value={project.stdin} oninput={(e) => onchange({ ...project, stdin: e.currentTarget.value })}></textarea>
         </label>
       {/if}

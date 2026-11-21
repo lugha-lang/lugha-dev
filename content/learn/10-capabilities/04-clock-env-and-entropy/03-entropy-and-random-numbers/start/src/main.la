@@ -1,0 +1,12 @@
+import std.random;
+
+fun main(console: Console, entropy: Entropy) {
+    let key = entropy.bytes(16);
+    console.println(key.len);
+    let mut rng = random.from_entropy(entropy);
+    let roll = rng.between(1, 7);
+    console.println(roll >= 1 && roll < 7);
+    let mut fixed = random.seeded(42);
+    let mut again = random.seeded(42);
+    console.println(fixed.between(1, 7) == again.between(1, 7));
+}
