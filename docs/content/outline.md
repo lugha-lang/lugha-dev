@@ -35,7 +35,7 @@ v18 changed; *(new)* is new in v5; *(moved)* comes from another v4 lesson.
 ## 1. Basics
 
 ### 1.1 Hello, world (approved, 2026-11-20)
-1. **The main function** *(changed)*: `fun main(console: Console)` and `console.println`. A fix step: the start calls `println` and gets E0471, whose help asks for a `Console` in `main`. [capabilities; m180]
+1. **The main function** *(changed)*: `fun main(console: Console)` and `console.println`. [capabilities; m180]
 2. **Semicolons** *(v4 kept)*: every statement ends with `;`, since newlines mean nothing. [values-and-types]
 3. **Comments** *(v4 kept)*: `//`, `/* … */` (they nest) and `/** … */`. [values-and-types]
 4. **Exit codes** *(changed)*: `fun main(console: Console): i32`; returning the number is the only way to set one. [capabilities; m180]
@@ -163,13 +163,13 @@ returning from a loop and recursion can use `if` and loops.
 4. **Passing a value to its own mut method** *(v4 kept)*: `v.add(v)` is E0508; copy first. [structs-and-enums]
 
 ### 4.3 Enums (approved, 2026-11-20)
-1. **Enum declaration** *(v4 kept)*: variants with data, built as `Shape.Circle(2.0)`; `Shape::Circle` is E0207. [structs-and-enums]
-2. **Matching on enums** *(changed)*: a variant in a pattern has a leading dot, `.Circle(r) =>`; without it, E0212. [match-and-patterns; m176]
+1. **Enum declaration** *(v4 kept)*: variants with data, built as `Shape.Circle(2.0)`. [structs-and-enums]
+2. **Matching on enums** *(changed)*: a variant in a pattern has a leading dot, `.Circle(r) =>`. [match-and-patterns; m176]
 3. **Recursive enums** *(v4 kept)*: a recursive enum needs no box. [structs-and-enums]
 
 ### 4.4 Option (approved, 2026-11-20)
 1. **Option instead of null** *(v4 kept)*: no null; `Option`, `Some`, `None`. [errors]
-2. **Matching on Option** *(changed)*: `.Some(n)` and `.None`; a bare `None` in a pattern is E0468. [match-and-patterns; m176]
+2. **Matching on Option** *(changed)*: `.Some(n)` and `.None`; a `match` missing `.None` is E0417. [match-and-patterns; m176]
 3. **Typing None** *(v4 kept)*: E0412. [errors]
 4. **unwrap_or, is_some and is_none** *(v4 kept)*. [errors]
 5. **Parsing numbers** *(v4 kept)*: `parse_i64`. [library/text]
@@ -307,7 +307,7 @@ Interfaces come first: in v18 every bound is an interface.
 ### 8.4 Generic types (approved, 2026-11-21)
 1. **Generic structs** *(v4 kept)*: `Pair<T>`; a bare `Pair` in a type is E0418. [generics]
 2. **Generic enums** *(v4 kept)*: `List<T>`. [generics]
-3. **Generic impl blocks** *(changed)*: `impl<T: Num> Stack<T>`; `impl Stack<T: Num>` is E0214. [generics; m222]
+3. **Generic impl blocks** *(changed)*: `impl<T> Stack<T>`, and `impl<T: Num> Stack<T>` for a bound. [generics; m222]
 
 ### 8.5 Equality, ordering and printing (approved, 2026-11-21)
 1. **Deep equality** *(changed)*: `==` compares deeply where `Eq` holds; what has no `==`. [interfaces; m167]
@@ -427,7 +427,7 @@ Tasks run on every core. Lessons print in an order they control (joins, channels
 step's output is the same every run.
 
 ### 12.1 Tasks and scopes (approved, 2026-11-21)
-1. **scope and spawn**: `scope s { s.spawn(f(x)) }`; a bare `spawn f()` is E0474. [tasks-and-scopes; m195]
+1. **scope and spawn**: `scope s { s.spawn(f(x)) }`. [tasks-and-scopes; m195]
 2. **join**: `t.join()` gives `Ok(value)`. [tasks-and-scopes]
 3. **A scope waits**: the body ends only when its tasks have; no task outlives it. [tasks-and-scopes]
 4. **The root scope**: `main` takes `root: Scope`. [tasks-and-scopes]
@@ -462,7 +462,7 @@ step's output is the same every run.
 
 ### 12.7 Actors (approved, 2026-11-21)
 1. **Actor declaration** *(v4 kept)*. [channels-and-actors]
-2. **Starting an actor** *(changed)*: `s.spawn(Counter { n: 0 })`; bare `spawn Counter { … }` is E0474. [channels-and-actors; m201]
+2. **Starting an actor** *(changed)*: `s.spawn(Counter { n: 0 })`. [channels-and-actors; m201]
 3. **Messages as method calls** *(v4 kept)*: without a result, the caller goes on; with one, it waits. [channels-and-actors]
 4. **Stopping an actor** *(changed)*: `stop`; the scope stops it at its end; there is no `join`. [channels-and-actors; m201]
 5. **Actor fields**: a `Ref` field is E0475. [channels-and-actors]

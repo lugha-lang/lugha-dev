@@ -12,7 +12,6 @@ fun main(console: Console) {
     for wanted of ["Ben", "Dee"] {
         match find(names, wanted) {
             .Some(i) => console.println("{wanted} is at {i}"),
-            None => console.println("{wanted} isn't there"),
         }
     }
 }

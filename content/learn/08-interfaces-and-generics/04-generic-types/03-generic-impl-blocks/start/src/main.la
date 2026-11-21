@@ -15,7 +15,7 @@ impl<T> Stack<T> {
     }
 }
 
-impl Stack<T: Num> {
+impl<T: Num> Stack<T> {
     fun total(self): T = self.items.fold(0, fun(sum, x) = sum + x);
 }
 

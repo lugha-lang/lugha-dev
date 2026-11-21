@@ -6,9 +6,9 @@ enum Shape {
 
 fun area(s: Shape): f64 {
     match s {
-        Circle(r) => 3.14 * r * r,
-        Rect(w, h) => w * h,
-        Empty => 0.0,
+        .Circle(r) => 3.14 * r * r,
+        .Rect(w, h) => w * h,
+        .Empty => 0.0,
     }
 }
 
