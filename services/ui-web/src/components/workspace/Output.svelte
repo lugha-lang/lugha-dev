@@ -49,19 +49,21 @@
       </div>
       {#each codes as code (code)}
         {@const e = explained[code]}
+        <!-- A step's own note stands in for lughac's first paragraph, which may lean on what the
+             learner hasn't met yet; "More about" still opens the whole explanation. -->
+        {@const own = note && note.code === code ? note.html : null}
         <aside class="explain">
-          {#if note && note.code === code}
-            <div class="prose">{@html note.html}</div>
-          {/if}
-          {#if e}
+          {#if own}
+            <div class="prose">{@html own}</div>
+          {:else if e}
             <div class="prose">{@html e.first}</div>
-            {#if e.rest}
-              <button type="button" class="more" aria-expanded={open[code] ?? false} onclick={() => (open[code] = !open[code])}>
-                {copy.moreAbout(code)}
-              </button>
-              {#if open[code]}
-                <div class="prose rest">{@html e.rest}</div>
-              {/if}
+          {/if}
+          {#if e && (own || e.rest)}
+            <button type="button" class="more" aria-expanded={open[code] ?? false} onclick={() => (open[code] = !open[code])}>
+              {copy.moreAbout(code)}
+            </button>
+            {#if open[code]}
+              <div class="prose rest">{@html own ? e.first + e.rest : e.rest}</div>
             {/if}
           {/if}
         </aside>
