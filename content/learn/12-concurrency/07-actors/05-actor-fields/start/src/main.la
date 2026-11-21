@@ -1,0 +1,17 @@
+actor Tally {
+    total: Ref<i64>,
+
+    fun add(self, n: i64) {
+        self.total.update(fun(t) = t + n);
+    }
+
+    fun get(self): i64 = self.total.get();
+}
+
+fun main(console: Console) {
+    let r = scope s {
+        let t = s.spawn(Tally { total: Ref.new(0) });
+        t.add(4);
+        console.println(t.get());
+    };
+}

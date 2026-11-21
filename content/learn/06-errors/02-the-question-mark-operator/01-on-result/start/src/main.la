@@ -1,0 +1,17 @@
+fun divide(a: i64, b: i64): Result<i64, string> {
+    if b == 0 {
+        return Err("division by zero");
+    }
+    Ok(a / b)
+}
+
+fun average(console: Console, total: i64, count: i64): Result<i64, string> {
+    let avg = divide(total, count)?;
+    console.println("divided {total} by {count}");
+    Ok(avg)
+}
+
+fun main(console: Console) {
+    console.println(average(console, 10, 2).debug());
+    console.println(average(console, 10, 0).debug());
+}

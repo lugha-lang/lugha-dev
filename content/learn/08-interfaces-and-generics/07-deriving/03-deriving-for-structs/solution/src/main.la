@@ -1,0 +1,29 @@
+interface Describe {
+    fun describe(self): string;
+}
+
+derive Describe for i64 {
+    fun describe(self): string = "{self}";
+}
+
+derive Describe for string {
+    fun describe(self): string = "\"{self}\"";
+}
+
+derive Describe for f64 {
+    fun describe(self): string = "{self}";
+}
+
+fun part<F: Describe>(ctx: (), name: string, field: F): string = "{name} is {field.describe()}";
+
+derive Describe for struct {
+    fun describe(self): string = derive.fields(self, (), part).join(", ");
+}
+
+struct Book { title: string, pages: i64, price: f64 } with Describe
+
+fun tell<T: Describe>(x: T): string = x.describe();
+
+fun main(console: Console) {
+    console.println(tell(Book { title: "Dune", pages: 412, price: 9.5 }));
+}

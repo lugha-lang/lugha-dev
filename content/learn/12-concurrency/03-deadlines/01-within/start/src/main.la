@@ -1,0 +1,26 @@
+import std.task;
+
+fun fetch(ms: i64): string {
+    task.sleep(ms);
+    "fetched in {ms} ms"
+}
+
+fun main(console: Console) {
+    let quick = scope s within 500 {
+        let t = s.spawn(fetch(100));
+        t.join().unwrap()
+    };
+    console.println(quick.debug());
+    let late = scope s within 500 {
+        let t = s.spawn(fetch(3_000));
+        t.join().unwrap()
+    };
+    match late {
+        .Ok(text) => console.println(text),
+        .Err(f) => match f.kind {
+            .Deadline => console.println("{f.task} ran out of time"),
+            .Error(e) => console.println("error: {e}"),
+            .Panic(m) => console.println("panic: {m}"),
+        },
+    }
+}

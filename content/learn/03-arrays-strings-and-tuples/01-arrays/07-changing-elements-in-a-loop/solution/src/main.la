@@ -1,7 +1,0 @@
-fun main() {
-    let mut scores = [70, 85, 90];
-    for score of mut scores {
-        score += 5;
-    }
-    println(scores);
-}

@@ -1,0 +1,8 @@
+struct Point { x: i64, y: i64 } with Key
+
+fun main(console: Console) {
+    let mut grid: Map<Point, char> = Map {};
+    grid[Point { x: 0, y: 0 }] = '#';
+    grid[Point { x: 1, y: 0 }] = '.';
+    console.println(grid[Point { x: 1, y: 0 }]);
+}

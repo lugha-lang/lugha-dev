@@ -1,0 +1,20 @@
+import std.task;
+
+fun crash(n: i64): i64 {
+    panic("too big: {n}");
+}
+
+fun slow(n: i64): i64 {
+    task.sleep(200);
+    n
+}
+
+fun main(console: Console) {
+    let r = scope s independent {
+        let a = s.spawn(crash(5));
+        let b = s.spawn(slow(7));
+        console.println(a.join().debug());
+        console.println(b.join().debug());
+    };
+    console.println(r.debug());
+}

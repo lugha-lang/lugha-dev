@@ -1,0 +1,14 @@
+struct FixedClock { at: i64 }
+
+impl Clock for FixedClock {
+    fun now_ms(self): i64 = self.at;
+    fun monotonic_ms(self): i64 = 0;
+    fun local_offset(self, ms: i64): Result<i64, string> = Ok(0);
+}
+
+fun main(console: Console) {
+    let clock = FixedClock { at: 1767225600000 };
+    console.println(clock.now_ms());
+    let as_clock: Clock = clock;
+    console.println(as_clock.monotonic_ms());
+}

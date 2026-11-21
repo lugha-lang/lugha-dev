@@ -7,8 +7,8 @@ impl Point {
     }
 }
 
-fun main() {
+fun main(console: Console) {
     let mut p = Point { x: 3, y: 4 };
     p.add(p);
-    println(p);
+    console.println(p.debug());
 }

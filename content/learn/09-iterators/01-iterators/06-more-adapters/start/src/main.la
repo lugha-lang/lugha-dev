@@ -1,0 +1,8 @@
+fun main(console: Console) {
+    let temps = [3, 5, 9, 4, 8];
+    console.println(temps.iter().take_while(fun(t) = t < 9).collect().debug());
+    console.println(temps.iter().skip_while(fun(t) = t < 9).collect().debug());
+    let words = ["ab", "cd"];
+    console.println(words.iter().flat_map(fun(w) = w.chars()).collect().debug());
+    console.println("hi".bytes().collect().debug());
+}

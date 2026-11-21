@@ -1,0 +1,5 @@
+fun main(clock: Clock, console: Console) {
+    let start = clock.monotonic_ms();
+    console.println("hello");
+    console.println(clock.monotonic_ms() >= start);
+}

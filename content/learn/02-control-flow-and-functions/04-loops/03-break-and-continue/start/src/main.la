@@ -1,4 +1,4 @@
-fun main() {
+fun main(console: Console) {
     for i in 1..10 {
         if i % 3 == 0 {
             continue;
@@ -6,6 +6,6 @@ fun main() {
         if i > 7 {
             break;
         }
-        println(i);
+        console.println(i);
     }
 }

@@ -1,0 +1,21 @@
+fun ping(console: Console, inbox: Receiver<string>, out: Sender<string>) {
+    let msg = inbox.recv();
+    console.println("ping got {msg.debug()}");
+    out.send("ping");
+}
+
+fun pong(console: Console, inbox: Receiver<string>, out: Sender<string>) {
+    let msg = inbox.recv();
+    console.println("pong got {msg.debug()}");
+    out.send("pong");
+}
+
+fun main(console: Console) {
+    let (to_ping, ping_inbox) = Chan<string>.new(1);
+    let (to_pong, pong_inbox) = Chan<string>.new(1);
+    let r = scope s {
+        s.spawn(ping(console, ping_inbox, to_pong));
+        s.spawn(pong(console, pong_inbox, to_ping));
+    };
+    console.println(r.debug());
+}

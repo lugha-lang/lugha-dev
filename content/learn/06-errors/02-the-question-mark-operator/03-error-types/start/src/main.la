@@ -1,0 +1,9 @@
+fun doubled(text: string): Result<i64, string> {
+    let n = parse_i64(text)?;
+    Ok(n * 2)
+}
+
+fun main(console: Console) {
+    console.println(doubled("21").debug());
+    console.println(doubled("x").debug());
+}

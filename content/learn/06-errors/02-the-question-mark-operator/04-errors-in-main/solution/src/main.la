@@ -1,0 +1,17 @@
+fun doubled(text: string): Result<i64, string> {
+    let n = parse_i64(text).ok_or("not a number")?;
+    Ok(n * 2)
+}
+
+fun main(console: Console): i32 {
+    match doubled("x") {
+        .Ok(n) => {
+            console.println(n);
+            0
+        }
+        .Err(e) => {
+            console.println("error: {e}");
+            1
+        }
+    }
+}

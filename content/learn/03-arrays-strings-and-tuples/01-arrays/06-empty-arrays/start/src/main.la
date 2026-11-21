@@ -1,0 +1,5 @@
+fun main(console: Console) {
+    let mut list = [];
+    list.push("milk");
+    console.println(list.debug());
+}

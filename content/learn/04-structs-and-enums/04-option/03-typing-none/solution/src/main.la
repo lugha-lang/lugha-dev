@@ -1,4 +1,4 @@
-fun main() {
+fun main(console: Console) {
     let mut first_big: Option<i64> = None;
     for n of [3, 8, 5, 12] {
         if n > 6 {
@@ -6,5 +6,5 @@ fun main() {
             break;
         }
     }
-    println(first_big);
+    console.println(first_big.debug());
 }

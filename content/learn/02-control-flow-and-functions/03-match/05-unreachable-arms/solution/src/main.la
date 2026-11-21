@@ -1,4 +1,4 @@
-fun main() {
+fun main(console: Console) {
     let day = 3;
     let name = match day {
         1 => "Monday",
@@ -6,5 +6,5 @@ fun main() {
         3 => "Wednesday",
         _ => "another day",
     };
-    println(name);
+    console.println(name);
 }

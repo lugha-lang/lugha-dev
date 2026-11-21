@@ -1,0 +1,11 @@
+struct Version { major: i64, minor: i64 } with Ord
+struct Tag { name: string } with Key
+
+fun main(console: Console) {
+    let versions = [Version { major: 2, minor: 0 }, Version { major: 1, minor: 9 }, Version { major: 1, minor: 10 }];
+    console.println(versions.sort().debug());
+    console.println(versions[1] < versions[2]);
+    console.println(versions[0] == Version { major: 2, minor: 0 });
+    let tags = Set { Tag { name: "new" }, Tag { name: "new" } };
+    console.println(tags.len);
+}

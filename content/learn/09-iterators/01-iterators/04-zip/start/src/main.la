@@ -1,0 +1,7 @@
+fun main(console: Console) {
+    let names = ["Ann", "Ben", "Cy"];
+    let ages = [31, 25];
+    for (name, age) of names.iter().zip(ages.iter()) {
+        console.println("{name} is {age}");
+    }
+}

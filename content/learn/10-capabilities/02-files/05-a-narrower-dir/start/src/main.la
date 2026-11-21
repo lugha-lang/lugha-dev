@@ -1,0 +1,17 @@
+fun save(data: Dir): Result<(), string> {
+    data.write_file("count.txt", "3")?;
+    data.write_file("../escape.txt", "no")?;
+    Ok(())
+}
+
+fun main(console: Console, fs: Fs): i32 {
+    let here = fs.cwd();
+    console.println(here.make_dirs("data").debug());
+    match here.dir("data") {
+        .Ok(data) => console.println(save(data).debug()),
+        .Err(e) => console.println(e),
+    }
+    console.println(here.exists("data/count.txt"));
+    console.println(here.exists("escape.txt"));
+    0
+}

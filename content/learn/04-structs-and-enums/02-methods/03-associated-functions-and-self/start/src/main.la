@@ -6,7 +6,7 @@ impl Point {
     fun origin(): Self = Self.new(0, 0);
 }
 
-fun main() {
-    println(Point.new(3, 4));
-    println(Point.origin());
+fun main(console: Console) {
+    console.println(Point.new(3, 4).debug());
+    console.println(Point.origin().debug());
 }

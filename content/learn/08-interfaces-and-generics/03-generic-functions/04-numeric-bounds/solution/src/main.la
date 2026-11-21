@@ -1,0 +1,15 @@
+fun total<T: Num>(xs: T[]): T {
+    let mut sum: T = 0;
+    for x of xs {
+        sum += x;
+    }
+    sum
+}
+
+fun half<T: Float>(x: T): T = x * 0.5;
+
+fun main(console: Console) {
+    console.println(total([1, 2, 3]));
+    console.println(total([0.5, 0.25]));
+    console.println(half(3.0));
+}

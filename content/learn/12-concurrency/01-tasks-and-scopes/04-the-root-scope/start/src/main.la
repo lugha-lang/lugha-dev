@@ -1,0 +1,11 @@
+import std.task;
+
+fun later(console: Console) {
+    task.sleep(200);
+    console.println("the task finishes");
+}
+
+fun main(console: Console, root: Scope) {
+    root.spawn(later(console));
+    console.println("main returns");
+}

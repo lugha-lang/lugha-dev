@@ -1,0 +1,14 @@
+import std.task;
+
+fun slow(console: Console) {
+    task.sleep(200);
+    console.println("the task is done");
+}
+
+fun main(console: Console) {
+    let r = scope s {
+        s.spawn(slow(console));
+        console.println("the body is done");
+    };
+    console.println("the scope is done");
+}

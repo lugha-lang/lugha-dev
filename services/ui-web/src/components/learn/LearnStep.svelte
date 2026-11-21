@@ -5,7 +5,7 @@
   import { onMount, untrack } from "svelte";
   import { copy } from "../../lib/copy";
   import { kept as makeKept } from "../../lib/kept";
-  import { doneBy, markDone, sunPosition, type Event, type Progress } from "../../lib/progress";
+  import { COURSE, doneBy, markDone, sunPosition, type Event, type Progress } from "../../lib/progress";
   import { projectOf, projectOfFiles, type File, type Project } from "../../lib/project";
   import { browserStore } from "../../lib/storage";
   import Workspace from "../workspace/Workspace.svelte";
@@ -39,6 +39,7 @@
 
   onMount(() => {
     kept = makeKept(browserStore());
+    kept.forCourse(COURSE);
     files = kept.stepFiles(step.id, step.files);
     progress = kept.progress();
   });

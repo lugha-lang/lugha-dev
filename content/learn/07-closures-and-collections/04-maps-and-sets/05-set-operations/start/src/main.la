@@ -1,0 +1,9 @@
+fun main(console: Console) {
+    let a = Set { 1, 2, 3 };
+    let b = Set { 2, 3, 4 };
+    console.println(a.union(b).debug());
+    console.println(a.intersect(b).debug());
+    console.println(a.minus(b).debug());
+    console.println(Set { 1, 2 } == Set { 2, 1 });
+    console.println(Map { "a": 1, "b": 2 } == Map { "b": 2, "a": 1 });
+}

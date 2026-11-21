@@ -1,0 +1,17 @@
+import std.task;
+
+fun wait_long(console: Console): i64 {
+    defer console.println("stopped waiting");
+    task.sleep(5_000);
+    1
+}
+
+fun main(console: Console) {
+    let r = scope s {
+        let t = s.spawn(wait_long(console));
+        task.sleep(100);
+        t.cancel("no longer needed");
+        console.println(t.join().debug());
+    };
+    console.println(r.debug());
+}

@@ -1,2 +1,0 @@
-circle of area 3.14
-square of area 4.0

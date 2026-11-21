@@ -1,4 +1,4 @@
-fun main() {
+fun main(console: Console) {
     let unread = 3;
-    if (unread > 0) println("you have mail");
+    if (unread > 0) console.println("you have mail");
 }

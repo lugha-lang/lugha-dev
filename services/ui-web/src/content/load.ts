@@ -35,7 +35,7 @@ export interface Step {
   /** Every file of the start, src/main.la first, then src/ and test/ by name. */
   files: SourceFile[];
   solutionFiles: SourceFile[] | null;
-  /** Whether the step has test/ files, so Test runs them and passing marks it done. */
+  /** Whether the step has tests (a test/ file, or an `@test` anywhere), so Test runs them and passing marks it done. */
   tests: boolean;
   expected: string;
   startError: string | null;
@@ -155,7 +155,8 @@ class Reader {
     };
     if (existsSync(join(this.root, path))) walk("");
     for (const f of files) {
-      if (!/^(src|test)\/[^/]+\.la$/.test(f.path) && f.path !== "lugha.toml") {
+      // The API's rule: every part of the path a plain name of letters, digits, `_` and `-`.
+      if (!/^(src|test)(\/[A-Za-z0-9_-]+)+\.la$/.test(f.path) && f.path !== "lugha.toml") {
         this.problems.push(`${path}: ${f.path} isn't a .la file under src/ or test/, or lugha.toml`);
       }
     }
@@ -221,9 +222,9 @@ function loadStep(r: Reader, dir: string, id: string, slug: string, highlight: H
   if (solutionFiles && solutionFiles.map((f) => f.path).join() !== files.map((f) => f.path).join()) {
     r.problems.push(`${dir}/solution: its files aren't the same as start's`);
   }
-  const tests = files.some((f) => f.path.startsWith("test/"));
+  const tests = files.some((f) => f.path.startsWith("test/") || /^\s*@test\b/m.test(f.text));
   const startFailing = front.start_failing === undefined ? null : front.start_failing.split(",").map((t) => t.trim()).filter((t) => t !== "");
-  if (startFailing !== null && !tests) r.problems.push(`${where}: start_failing needs test/ files`);
+  if (startFailing !== null && !tests) r.problems.push(`${where}: start_failing needs a file with an @test`);
   const aboutStart = front.start_error ?? front.start_output ?? front.start_failing ?? front.error_note;
   if (solution !== null && front.start_error === undefined && front.start_output === undefined && startFailing === null) {
     r.problems.push(`${where}: a step with a solution needs start_error, start_output or start_failing`);

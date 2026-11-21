@@ -1,0 +1,4 @@
+fun main(console: Console) {
+    let fact = fun(n: i64): i64 = if n <= 1 { 1 } else { n * fact(n - 1) };
+    console.println(fact(5));
+}

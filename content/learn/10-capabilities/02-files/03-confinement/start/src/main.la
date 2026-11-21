@@ -1,0 +1,10 @@
+fun main(console: Console, fs: Fs) {
+    let dir = fs.cwd();
+    console.println(dir.read_file("../secret.txt").debug());
+    console.println(dir.read_file("/etc/hostname").debug());
+    console.println(dir.read_file("src/../lugha.toml").is_ok());
+    match fs.dir("/tmp") {
+        .Ok(tmp) => console.println(tmp.write_file("x.txt", "hi").debug()),
+        .Err(e) => console.println(e),
+    }
+}

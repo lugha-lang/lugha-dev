@@ -1,0 +1,10 @@
+fun first<T>(xs: T[]): Option<T> {
+    if xs.len == 0 {
+        return None;
+    }
+    Some(xs[0])
+}
+
+fun main(console: Console) {
+    console.println(first([]).debug());
+}

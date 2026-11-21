@@ -1,6 +1,6 @@
-fun main() {
-    println(i8.MIN);
-    println(i8.MAX);
-    println(u8.MAX);
-    println(i64.MAX);
+fun main(console: Console) {
+    console.println(i8.MIN);
+    console.println(i8.MAX);
+    console.println(u8.MAX);
+    console.println(i64.MAX);
 }

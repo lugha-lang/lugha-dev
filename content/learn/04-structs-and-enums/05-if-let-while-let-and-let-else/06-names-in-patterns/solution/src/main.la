@@ -1,0 +1,17 @@
+enum Shape {
+    Circle(f64),
+    Rect(f64, f64),
+    Empty,
+}
+
+fun describe(s: Shape): string {
+    match s {
+        .Empty => "an empty shape",
+        .Circle(r) => "a circle of radius {r}",
+        .Rect(w, h) => "a {w} by {h} rectangle",
+    }
+}
+
+fun main(console: Console) {
+    console.println(describe(Shape.Circle(1.5)));
+}

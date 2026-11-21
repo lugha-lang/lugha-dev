@@ -1,5 +1,0 @@
-fun main() {
-    let mut list: string[] = [];
-    list.push("milk");
-    println(list);
-}

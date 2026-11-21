@@ -1,5 +1,5 @@
-fun main() {
+fun main(console: Console) {
     let width = 7;
     let height: i64 = 3;
-    println(width * height);
+    console.println(width * height);
 }

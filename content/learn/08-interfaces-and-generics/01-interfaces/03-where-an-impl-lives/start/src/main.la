@@ -1,0 +1,7 @@
+impl Display for bool {
+    fun show(self): string = if self { "yes" } else { "no" };
+}
+
+fun main(console: Console) {
+    console.println(true);
+}

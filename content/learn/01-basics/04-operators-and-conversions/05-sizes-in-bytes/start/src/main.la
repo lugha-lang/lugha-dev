@@ -1,0 +1,6 @@
+fun main(console: Console) {
+    console.println(8.kb());
+    console.println(64.mb());
+    let pages: u32 = 3;
+    console.println(pages.kb());
+}

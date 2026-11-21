@@ -7,6 +7,8 @@ export interface Backing {
   getItem(key: string): string | null;
   setItem(key: string, value: string): void;
   removeItem(key: string): void;
+  readonly length: number;
+  key(index: number): string | null;
 }
 
 /** Gets, sets and removes values; none of its calls throw. */
@@ -15,6 +17,8 @@ export interface Store {
   /** Keeps a value and tells whether it was kept. */
   set(key: string, value: unknown): boolean;
   remove(key: string): void;
+  /** Removes every value whose key starts with `prefix`. */
+  removeStarting(prefix: string): void;
 }
 
 const PREFIX = "lugha.";
@@ -42,6 +46,19 @@ export function makeStore(backing: Backing | null): Store {
     remove(key) {
       try {
         backing?.removeItem(PREFIX + key);
+      } catch {
+        // Nothing was kept, so there's nothing to remove.
+      }
+    },
+    removeStarting(prefix) {
+      try {
+        if (!backing) return;
+        const keys: string[] = [];
+        for (let i = 0; i < backing.length; i++) {
+          const k = backing.key(i);
+          if (k?.startsWith(PREFIX + prefix)) keys.push(k);
+        }
+        for (const k of keys) backing.removeItem(k);
       } catch {
         // Nothing was kept, so there's nothing to remove.
       }

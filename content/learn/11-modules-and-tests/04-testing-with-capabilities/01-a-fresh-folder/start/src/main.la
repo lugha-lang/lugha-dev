@@ -1,0 +1,16 @@
+fun count_lines(dir: ReadDir, path: string): Result<i64, string> {
+    let text = dir.read_file(path)?;
+    Ok(text.lines().len)
+}
+
+fun main(console: Console, fs: Fs) {
+    console.println(count_lines(fs.cwd().read_only(), "src/main.la").is_ok());
+}
+
+@test
+fun counts_lines_in_a_fresh_folder(dir: Dir) {
+    assert_eq(dir.list("."), Ok([]));
+    dir.write_file("a.txt", "one\ntwo\n").unwrap();
+    assert_eq(count_lines(dir.read_only(), "a.txt"), Ok(2));
+    assert(count_lines(dir.read_only(), "missing.txt").is_err());
+}

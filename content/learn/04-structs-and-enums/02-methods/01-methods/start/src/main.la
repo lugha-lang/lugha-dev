@@ -4,7 +4,7 @@ impl Point {
     fun length_squared(self): i64 = self.x * self.x + self.y * self.y;
 }
 
-fun main() {
+fun main(console: Console) {
     let p = Point { x: 3, y: 4 };
-    println(p.length_squared());
+    console.println(p.length_squared());
 }

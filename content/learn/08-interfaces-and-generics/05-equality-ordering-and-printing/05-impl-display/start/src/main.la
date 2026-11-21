@@ -1,0 +1,12 @@
+struct Version { major: i64, minor: i64 }
+
+impl Display for Version {
+    fun show(self): string = "v{self.major}.{self.minor}";
+}
+
+fun main(console: Console) {
+    let v = Version { major: 1, minor: 10 };
+    console.println(v);
+    console.println("running {v}");
+    console.println([v, Version { major: 2, minor: 0 }].debug());
+}

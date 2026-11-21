@@ -1,0 +1,11 @@
+interface Label {
+    fun label(self): string;
+}
+
+impl Label for bool {
+    fun label(self): string = if self { "yes" } else { "no" };
+}
+
+fun main(console: Console) {
+    console.println(true.label());
+}

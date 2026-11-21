@@ -1,0 +1,25 @@
+struct Countdown { n: i64 }
+
+impl Iter<i64> for Countdown {
+    fun next(mut self): Option<i64> {
+        if self.n == 0 {
+            return None;
+        }
+        self.n -= 1;
+        Some(self.n + 1)
+    }
+}
+
+fun total<I: Iter<i64>>(it: I): i64 {
+    let mut sum = 0;
+    for x of it {
+        sum += x;
+    }
+    sum
+}
+
+fun main(console: Console) {
+    console.println(total(Countdown { n: 4 }));
+    console.println(total(range(1, 5)));
+    console.println(total([2, 3].iter().map(fun(x) = x * 10)));
+}

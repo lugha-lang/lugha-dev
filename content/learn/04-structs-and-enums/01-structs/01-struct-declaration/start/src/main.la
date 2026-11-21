@@ -1,7 +1,7 @@
 struct Point { x: i64, y: i64 }
 
-fun main() {
+fun main(console: Console) {
     let p = Point { x: 3, y: 4 };
-    println(p.x);
-    println(p.y);
+    console.println(p.x);
+    console.println(p.y);
 }

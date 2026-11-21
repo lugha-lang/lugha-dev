@@ -7,7 +7,7 @@ fun describe(x: i64, y: i64): string {
     }
 }
 
-fun main() {
-    println(describe(0, 4));
-    println(describe(2, 3));
+fun main(console: Console) {
+    console.println(describe(0, 4));
+    console.println(describe(2, 3));
 }

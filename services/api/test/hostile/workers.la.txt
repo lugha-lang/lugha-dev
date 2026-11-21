@@ -1,0 +1,4 @@
+// Prints how many worker threads its tasks get: one, wherever it runs.
+fun main(console: Console, env: Env) {
+    console.println(env.get("LUGHA_WORKERS").unwrap_or("unset"));
+}

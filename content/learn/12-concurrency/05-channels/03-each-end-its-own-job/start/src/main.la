@@ -1,0 +1,5 @@
+fun main(console: Console) {
+    let (tx, rx) = Chan<string>.new(2);
+    rx.send("hello");
+    console.println(rx.recv().debug());
+}

@@ -4,6 +4,6 @@ fun with_tax(price: i64): i64 {
     price
 }
 
-fun main() {
-    println(with_tax(200));
+fun main(console: Console) {
+    console.println(with_tax(200));
 }

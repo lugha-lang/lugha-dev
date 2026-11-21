@@ -1,6 +1,6 @@
 // Prints as fast as it can: the output must be cut, never the service.
-fun main() {
+fun main(console: Console) {
     loop {
-        println("spam spam spam spam spam spam spam spam spam spam spam spam spam spam");
+        console.println("spam spam spam spam spam spam spam spam spam spam spam spam spam spam");
     }
 }

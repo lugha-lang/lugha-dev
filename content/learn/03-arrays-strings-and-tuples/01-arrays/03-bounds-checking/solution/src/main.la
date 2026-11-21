@@ -1,5 +1,0 @@
-fun main() {
-    let scores = [70, 85, 90];
-    println(scores[0]);
-    println(scores[scores.len - 1]);
-}

@@ -1,0 +1,6 @@
+import shapes as geo;
+
+fun main(console: Console) {
+    let s = geo.Square { side: 3.0 };
+    console.println(geo.area(s));
+}

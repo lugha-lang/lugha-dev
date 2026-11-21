@@ -1,0 +1,28 @@
+interface Gauge {
+    fun close_to(self, other: Self): bool;
+    fun total(self): i64;
+}
+
+derive Gauge for i64 {
+    fun close_to(self, other: i64): bool = self - other <= 1 && other - self <= 1;
+    fun total(self): i64 = self;
+}
+
+fun near<F: Gauge>(name: string, x: F, y: F): bool = x.close_to(y);
+
+fun add_up<F: Gauge>(sum: i64, name: string, part: F): i64 = sum + part.total();
+
+derive Gauge for struct {
+    fun close_to(self, other: Self): bool = derive.all(self, other, near);
+    fun total(self): i64 = derive.fold(self, 0, add_up);
+}
+
+struct Reading { morning: i64, evening: i64 } with Gauge
+
+fun compare<T: Gauge>(a: T, b: T): string = "{a.total()} and {b.total()}, close: {a.close_to(b)}";
+
+fun main(console: Console) {
+    let a = Reading { morning: 20, evening: 25 };
+    console.println(compare(a, Reading { morning: 21, evening: 24 }));
+    console.println(compare(a, Reading { morning: 23, evening: 25 }));
+}

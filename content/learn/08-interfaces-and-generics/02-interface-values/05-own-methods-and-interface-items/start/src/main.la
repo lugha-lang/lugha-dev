@@ -1,0 +1,19 @@
+interface Shape {
+    fun area(self): f64;
+}
+
+struct Circle { r: f64 }
+
+impl Circle {
+    fun area(self): f64 = self.r * self.r;
+}
+
+impl Shape for Circle {
+    fun area(self): f64 = 3.0 * self.r * self.r;
+}
+
+fun main(console: Console) {
+    let c = Circle { r: 1.0 };
+    console.println(c.area());
+    console.println(Shape.area(c));
+}

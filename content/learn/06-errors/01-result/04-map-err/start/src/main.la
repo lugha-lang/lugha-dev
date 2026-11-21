@@ -1,0 +1,14 @@
+fun divide(a: i64, b: i64): Result<i64, string> {
+    if b == 0 {
+        return Err("division by zero");
+    }
+    Ok(a / b)
+}
+
+fun explain(e: string): string = "couldn't divide 10 by 0: {e}";
+
+fun main(console: Console) {
+    let result = divide(10, 0);
+    console.println(result.debug());
+    console.println(result.map_err(explain).debug());
+}

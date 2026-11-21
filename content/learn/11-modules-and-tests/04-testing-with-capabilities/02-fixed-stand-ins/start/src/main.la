@@ -1,0 +1,19 @@
+fun main(console: Console) {
+    console.println("see the tests");
+}
+
+@test
+fun a_fixed_clock(clock: Clock) {
+    assert_eq(clock.now_ms(), 946684800000);
+    assert_eq(clock.monotonic_ms(), 0);
+}
+
+@test
+fun an_empty_environment(env: Env) {
+    assert_eq(env.get("PATH"), None);
+}
+
+@test
+fun seeded_entropy(entropy: Entropy) {
+    assert_eq(entropy.bytes(4), [175, 205, 29, 123]);
+}

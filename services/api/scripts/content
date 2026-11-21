@@ -19,7 +19,8 @@ failed=0
 passed=0
 
 for name in $(lughac test --list test/content.la | awk '{print $2}'); do
-	if out=$(lughac test --integration --timeout 600 --exact --filter "$name" test/content.la 2>&1); then
+	# The whole course is one test, a few hundred programs compiled one after another.
+	if out=$(lughac test --integration --timeout 3600 --exact --filter "$name" test/content.la 2>&1); then
 		echo "ok      $name"
 		passed=$((passed + 1))
 	else

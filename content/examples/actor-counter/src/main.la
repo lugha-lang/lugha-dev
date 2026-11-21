@@ -1,4 +1,4 @@
-//: An `actor` declares state that one green thread owns. Its fields are private to it.
+//: An `actor` declares state that one task owns. Its fields are private to it.
 actor Counter {
     count: i64,
 //: Its methods are messages, handled one at a time, so the state needs no locks.
@@ -6,10 +6,13 @@ actor Counter {
     fun get(self): i64 = self.count;
 }
 
-//: `spawn` starts the actor. `c.add(5)` is queued; `c.get()` waits for the answer.
-fun main() {
-    let c = spawn Counter { count: 0 };
-    c.add(5);
-    c.add(2);
-    println(c.get());
+//: An actor starts in a scope, as a task does. `c.add(5)` is queued; `c.get()` waits for the answer.
+fun main(console: Console) {
+    let r = scope s {
+        let c = s.spawn(Counter { count: 0 });
+        c.add(5);
+        c.add(2);
+        c.get()
+    };
+    console.println(r.debug());
 }

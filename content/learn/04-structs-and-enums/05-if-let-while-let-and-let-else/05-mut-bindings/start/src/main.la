@@ -1,11 +1,11 @@
-fun main() {
+fun main(console: Console) {
     let count: Option<i64> = Some(4);
     match count {
-        Some(n) => {
+        .Some(n) => {
             n += 1;
-            println(n);
+            console.println(n);
         }
-        None => println("no count"),
+        .None => console.println("no count"),
     }
-    println(count);
+    console.println(count.debug());
 }

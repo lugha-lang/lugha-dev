@@ -13,6 +13,12 @@ class Memory {
   removeItem(k: string) {
     this.data.delete(k);
   }
+  get length() {
+    return this.data.size;
+  }
+  key(i: number) {
+    return [...this.data.keys()][i] ?? null;
+  }
 }
 
 const broken = {
@@ -23,6 +29,12 @@ const broken = {
     throw new Error("QuotaExceededError");
   },
   removeItem() {
+    throw new Error("SecurityError");
+  },
+  get length(): number {
+    throw new Error("SecurityError");
+  },
+  key(): string | null {
     throw new Error("SecurityError");
   },
 };
@@ -51,6 +63,14 @@ describe("store", () => {
       expect(s.set("a", 1)).toBe(false);
       expect(s.get("a")).toBeNull();
       expect(() => s.remove("a")).not.toThrow();
+      expect(() => s.removeStarting("a")).not.toThrow();
     }
+  });
+
+  it("removes every key under the lugha. prefix that starts with a given prefix, and nothing else", () => {
+    const m = new Memory();
+    for (const k of ["lugha.step.a/b/c", "lugha.step.d/e/f", "lugha.progress", "other.step.x"]) m.setItem(k, "1");
+    makeStore(m).removeStarting("step.");
+    expect([...m.data.keys()].sort()).toEqual(["lugha.progress", "other.step.x"]);
   });
 });

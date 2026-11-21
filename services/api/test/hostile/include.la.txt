@@ -2,6 +2,6 @@
 // package, and the compiler runs in the sandbox anyway.
 const PASSWD: string = include_str("../../../../../../etc/passwd");
 
-fun main() {
-    println(PASSWD);
+fun main(console: Console) {
+    console.println(PASSWD);
 }

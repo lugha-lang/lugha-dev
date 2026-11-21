@@ -1,0 +1,15 @@
+actor Divider {
+    by: i64,
+
+    fun show(self, n: i64): i64 = n / self.by;
+}
+
+fun main(console: Console) {
+    let ok = scope s {
+        let a = s.spawn(Divider { by: 2 });
+        console.println(a.show(10));
+        a.stop();
+        console.println(a.show(4));
+    };
+    console.println(ok.debug());
+}

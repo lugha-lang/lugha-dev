@@ -1,0 +1,18 @@
+fun produce(out: Sender<i64>, n: i64) {
+    for i in 1..n + 1 {
+        out.send(i * i);
+    }
+}
+
+fun main(console: Console) {
+    let (tx, rx) = Chan<i64>.new(4);
+    let r = scope s {
+        s.spawn(produce(tx, 5));
+        let mut total = 0;
+        for v of rx {
+            total += v;
+        }
+        console.println(total);
+    };
+    console.println(r.debug());
+}

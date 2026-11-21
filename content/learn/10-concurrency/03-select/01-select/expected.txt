@@ -1,4 +1,0 @@
-fruit: apple
-tool: saw
-fruit: pear
-tool: drill

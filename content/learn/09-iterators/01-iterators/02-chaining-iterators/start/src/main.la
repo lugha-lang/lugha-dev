@@ -1,0 +1,6 @@
+fun main(console: Console) {
+    let squares = range(1, 10).filter(fun(n) = n % 3 == 0).map(fun(n) = n * n).collect();
+    console.println(squares.debug());
+    let all = [1, 2].iter().chain([3, 4].iter()).collect();
+    console.println(all.debug());
+}

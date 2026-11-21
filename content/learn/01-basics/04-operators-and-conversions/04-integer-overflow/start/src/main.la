@@ -1,5 +1,5 @@
-fun main() {
+fun main(console: Console) {
     let level: u8 = 250;
-    println(level + 5);
-    println(level + 10);
+    console.println(level + 5);
+    console.println(level + 10);
 }

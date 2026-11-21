@@ -1,9 +1,9 @@
-fun main() {
+fun main(console: Console) {
     let grade = 'b';
-    println(grade < 'c');
-    println('7'.is_digit());
-    println(grade.to_upper());
-    println('é'.to_upper());
-    println('ß'.to_upper());
-    println('ж'.to_upper());
+    console.println(grade < 'c');
+    console.println('7'.is_digit());
+    console.println(grade.to_upper());
+    console.println('é'.to_upper());
+    console.println('ß'.to_upper());
+    console.println('ж'.to_upper());
 }

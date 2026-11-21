@@ -1,0 +1,17 @@
+interface Shape {
+    fun area(self): f64;
+    fun name(self): string;
+}
+
+struct Circle { r: f64 }
+
+impl Shape for Circle {
+    fun area(self): f64 = 3.14 * self.r * self.r;
+    fun name(self): string = "circle";
+}
+
+fun describe(s: Shape): string = "{s.name()} of area {s.area()}";
+
+fun main(console: Console) {
+    console.println(describe(Circle { r: 1.0 }));
+}

@@ -1,0 +1,9 @@
+fun main(console: Console) {
+    let mut ages = Map { "ann": 31, "bo": 40 };
+    console.println(ages["ann"]);
+    ages["cy"] = 25;
+    ages["bo"] += 1;
+    console.println(ages.debug());
+    let none_yet: Map<string, i64> = Map {};
+    console.println(none_yet.debug());
+}

@@ -1,6 +1,6 @@
-fun main() {
+fun main(console: Console) {
     let name = "Amina";
     let points = 7;
-    println("{name} has {points} points");
-    println("doubled: {points * 2}");
+    console.println("{name} has {points} points");
+    console.println("doubled: {points * 2}");
 }

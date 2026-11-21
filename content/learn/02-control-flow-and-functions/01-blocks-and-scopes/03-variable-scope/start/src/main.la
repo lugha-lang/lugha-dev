@@ -1,7 +1,7 @@
-fun main() {
+fun main(console: Console) {
     let total = {
         let price = 40;
         price + 6
     };
-    println(price);
+    console.println(price);
 }

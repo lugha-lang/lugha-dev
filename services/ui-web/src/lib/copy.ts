@@ -23,9 +23,10 @@ export const copy = {
   tests: "Tests",
   input: "Input",
   arguments: "Arguments",
-  argumentsHelp: ["Passed after ", "--", "; read them with ", "args()", "."],
+  // The help lines alternate plain text and code: every second part is shown as code.
+  argumentsHelp: ["Passed after ", "--", "; ", "main", " takes them as ", "args: string[]", "."],
   stdin: "Standard input",
-  stdinHelp: ["What ", "read_line()", " reads, one line at a time."],
+  stdinHelp: ["What ", "console.read_line()", " reads, one line at a time."],
   format: "Format",
   test: "Test",
   share: "Share",

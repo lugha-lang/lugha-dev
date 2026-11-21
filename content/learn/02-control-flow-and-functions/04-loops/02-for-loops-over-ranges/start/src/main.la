@@ -1,5 +1,5 @@
-fun main() {
+fun main(console: Console) {
     for i in 1..4 {
-        println(i);
+        console.println(i);
     }
 }

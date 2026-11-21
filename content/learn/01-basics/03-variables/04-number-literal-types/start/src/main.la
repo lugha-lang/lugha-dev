@@ -1,7 +1,7 @@
-fun main() {
+fun main(console: Console) {
     let width = 7;
     let height: u8 = 7;
-    let doubled = height * 300;
-    println(width);
-    println(doubled);
+    let scaled = height * 300;
+    console.println(width);
+    console.println(scaled);
 }

@@ -1,0 +1,9 @@
+fun noisy(console: Console) {
+    console.println("result: 42");
+    console.eprintln("note: took a while");
+}
+
+fun main(console: Console) {
+    noisy(console);
+    noisy(console.stdout_only());
+}

@@ -1,7 +1,0 @@
-fun main() {
-    let names = ["Ann", "Ben", "Cy"];
-    let ages = [31, 25];
-    for (name, age) of names.iter().zip(ages.iter()) {
-        println("{name} is {age}");
-    }
-}

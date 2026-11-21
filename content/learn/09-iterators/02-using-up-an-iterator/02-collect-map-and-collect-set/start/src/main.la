@@ -1,0 +1,6 @@
+fun main(console: Console) {
+    let names = ["ann", "bo", "ann"];
+    console.println(names.iter().collect_set().debug());
+    let scores = [("ann", 1), ("bo", 2), ("ann", 3)];
+    console.println(scores.iter().collect_map().debug());
+}

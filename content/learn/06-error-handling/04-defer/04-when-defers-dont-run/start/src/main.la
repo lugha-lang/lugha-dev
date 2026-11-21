@@ -1,5 +1,0 @@
-fun main() {
-    defer println("cleaning up");
-    let ages = [30, 41];
-    println(ages[2]);
-}

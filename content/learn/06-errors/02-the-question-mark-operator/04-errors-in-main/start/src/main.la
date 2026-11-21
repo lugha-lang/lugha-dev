@@ -1,0 +1,10 @@
+fun doubled(text: string): Result<i64, string> {
+    let n = parse_i64(text).ok_or("not a number")?;
+    Ok(n * 2)
+}
+
+fun main(console: Console): i32 {
+    let n = doubled("x")?;
+    console.println(n);
+    0
+}

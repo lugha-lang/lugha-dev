@@ -1,6 +1,0 @@
-fun main() {
-    let names = ["Ann", "Ben", "Cy"];
-    for p of names.iter().enumerate() {
-        println("{p.i}: {p.value}");
-    }
-}

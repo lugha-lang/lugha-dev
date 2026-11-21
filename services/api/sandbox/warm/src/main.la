@@ -1,7 +1,7 @@
 // Built when the sandbox image is made, so lughac's object cache already
-// holds the runtime and the garbage collector at -O 0 and -O 2.
-fun main() {
-    println("warm");
+// holds the runtime at -O 0 and -O 2.
+fun main(console: Console) {
+    console.println("warm");
 }
 
 @test

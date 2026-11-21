@@ -1,0 +1,21 @@
+fun greeting(clock: Clock): string {
+    let hour = clock.now_ms() / 3600000 % 24;
+    if hour < 12 { "good morning" } else { "good afternoon" }
+}
+
+struct FixedClock { at: i64 }
+
+impl Clock for FixedClock {
+    fun now_ms(self): i64 = self.at;
+    fun monotonic_ms(self): i64 = 0;
+    fun local_offset(self, ms: i64): Result<i64, string> = Ok(0);
+}
+
+fun main(console: Console, clock: Clock) {
+    console.println(greeting(clock).len > 0);
+}
+
+@test
+fun afternoon(clock: Clock) {
+    assert_eq(greeting(clock), "good afternoon");
+}

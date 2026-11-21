@@ -1,3 +1,0 @@
-Ok(10)
-milk
-eggs

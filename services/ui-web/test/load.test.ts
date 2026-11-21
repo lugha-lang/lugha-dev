@@ -84,8 +84,8 @@ describe("loadContent", () => {
   it("reads the real content/", async () => {
     const r = await loadContent(join(import.meta.dirname, "../../../content"), code);
     if (!r.ok) throw new Error(r.error.join("\n"));
-    expect(r.value.chapters.map((c) => c.slug)).toEqual(["basics", "control-flow-and-functions", "arrays-strings-and-tuples", "structs-and-enums", "values", "error-handling", "closures-iterators-and-collections", "generics-and-interfaces", "modules-and-tests", "concurrency"]);
-    expect(r.value.chapters.find((c) => c.slug === "values")?.lessons[0].steps).toHaveLength(6);
+    expect(r.value.chapters.map((c) => c.slug)).toEqual(["basics", "control-flow-and-functions", "arrays-strings-and-tuples", "structs-and-enums", "value-semantics", "errors", "closures-and-collections", "interfaces-and-generics", "iterators", "capabilities", "modules-and-tests", "concurrency"]);
+    expect(r.value.chapters.find((c) => c.slug === "value-semantics")?.lessons[0].steps).toHaveLength(6);
     expect(r.value.home.expected).toBe("832040\n");
     expect(r.value.playground.source).toContain("enum Shape");
     expect(r.value.examples.map((e) => e.slug)).toEqual(["hello-world", "fibonacci", "word-frequency", "green-threads", "actor-counter"]);
@@ -168,6 +168,30 @@ describe("loadContent, steps with several files", () => {
     expect(step).toMatchObject({ tests: true, startFailing: ["area_works", "other"], kind: "fix" });
   });
 
+  it("makes a step with an @test in src/ a test step", async () => {
+    const files = { ...withTests };
+    delete files[`${tested}/start/test/area.la`];
+    delete files[`${tested}/solution/test/area.la`];
+    files[`${tested}/start/src/main.la`] = `${MAIN}\n@test\nfun area_works() {}\n`;
+    files[`${tested}/solution/src/main.la`] = `${MAIN}\n@test\nfun area_works() {}\n`;
+    const r = await loadContent(tree(files), code);
+    if (!r.ok) throw new Error(r.error.join("\n"));
+    const step = r.value.chapters[0].lessons[0].steps[3];
+    expect(step).toMatchObject({ tests: true, startFailing: ["area_works", "other"] });
+  });
+
+  it("reads a module in a folder under src/", async () => {
+    const files = {
+      ...withFiles,
+      [`${multi}/start/src/geo/square.la`]: "fun s() {}\n",
+      [`${multi}/solution/src/geo/square.la`]: "fun s() {}\n",
+    };
+    const r = await loadContent(tree(files), code);
+    if (!r.ok) throw new Error(r.error.join("\n"));
+    const step = r.value.chapters[0].lessons[0].steps[3];
+    expect(step.files.map((f) => f.path)).toEqual(["src/main.la", "src/a.la", "src/geo/square.la", "src/shapes.la"]);
+  });
+
   it("reads a step's own lugha.toml, listed last", async () => {
     const files = {
       ...withTests,
@@ -189,9 +213,10 @@ describe("loadContent, steps with several files", () => {
 
   const broken: [string, Record<string, string | null>, Record<string, string>, string][] = [
     ["a file outside src/ and test/", { [`${multi}/start/lib/x.la`]: "x" }, withFiles, `${multi}/start: lib/x.la isn't a .la file under src/ or test/, or lugha.toml`],
+    ["a name with a space", { [`${multi}/start/src/my notes.la`]: "x" }, withFiles, `${multi}/start: src/my notes.la isn't a .la file under src/ or test/, or lugha.toml`],
     ["a file that isn't .la", { [`${multi}/start/src/notes.txt`]: "x" }, withFiles, `${multi}/start: src/notes.txt isn't a .la file under src/ or test/, or lugha.toml`],
     ["solution files differing from start's", { [`${multi}/solution/src/a.la`]: null }, withFiles, `${multi}/solution: its files aren't the same as start's`],
-    ["start_failing without tests", { [`${multi}/step.md`]: "---\ntitle: M\nstart_failing: x\n---\n" }, withFiles, `${multi}/step.md: start_failing needs test/ files`],
+    ["start_failing without tests", { [`${multi}/step.md`]: "---\ntitle: M\nstart_failing: x\n---\n" }, withFiles, `${multi}/step.md: start_failing needs a file with an @test`],
   ];
   for (const [what, change, base, problem] of broken) {
     it(`fails on ${what}`, async () => {

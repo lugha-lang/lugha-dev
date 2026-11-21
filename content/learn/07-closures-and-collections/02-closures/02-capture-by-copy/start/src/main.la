@@ -1,0 +1,7 @@
+fun main(console: Console) {
+    let mut rate = 2;
+    let scale = fun(x: i64): i64 = x * rate;
+    rate = 7;
+    console.println(scale(5));
+    console.println(rate);
+}

@@ -34,7 +34,7 @@ struct Setup {
  * runsc and the sandbox image is built; panics with what's missing otherwise.
  */
 fun setup(env: Env, proc: Proc, net: Net, clock: Clock, entropy: Entropy): Setup {
-    let image = env.get("SANDBOX_IMAGE").unwrap_or("lugha-sandbox:m159");
+    let image = env.get("SANDBOX_IMAGE").unwrap_or("lugha-sandbox:m240");
     let asked = env.get("SANDBOX_TESTS") == Some("1");
     let has_runsc = match proc.run("docker", ["info", "--format", "{{{{json .Runtimes}}}}"]) {
         .Ok(out) => out.stdout.contains("\"runsc\""),
@@ -76,9 +76,11 @@ fun stopped_of(v: json.Value): string = text_at(v, "program", "stopped");
 
 /** After an attack, the sandbox still answers an ordinary program. */
 fun still_works(s: Setup) {
-    let v = run(s, "fun main() {{\n    println(\"still here\");\n}}\n", []).expect(
-        "the next run failed",
-    );
+    let v = run(
+        s,
+        "fun main(console: Console) {{\n    console.println(\"still here\");\n}}\n",
+        [],
+    ).expect("the next run failed");
     assert_eq(stdout_of(v), "still here\n");
 }
 
@@ -217,9 +219,23 @@ fun arguments_arrive_as_sent_never_through_a_shell(
     entropy: Entropy,
 ) {
     let s = setup(env, proc, net, clock, entropy);
-    let args = ["; rm -rf /", "$(id)", "`id`", "a b", "*"];
+    // The program is started through `env`, which must read none of these as its own.
+    let args = ["; rm -rf /", "$(id)", "`id`", "a b", "*", "LUGHA_WORKERS=8", "-i"];
     let v = run(s, include_str("hostile/args.la.txt"), args).expect("no result");
     assert_eq(stdout_of(v), args.join("\n") + "\n");
+}
+
+@test(integration)
+fun a_program_gets_one_worker_thread(
+    env: Env,
+    proc: Proc,
+    net: Net,
+    clock: Clock,
+    entropy: Entropy,
+) {
+    let s = setup(env, proc, net, clock, entropy);
+    let v = run(s, include_str("hostile/workers.la.txt"), []).expect("no result");
+    assert_eq(stdout_of(v), "1\n");
 }
 
 @test
@@ -258,7 +274,10 @@ fun two_jobs_at_once_are_each_held_by_their_own_limits(
         let spin = both.spawn(timed(s, include_str("hostile/spin.la.txt")));
         // Started a moment later, so the endless loop is already running.
         task.sleep(200);
-        let ordinary = both.spawn(timed(s, "fun main() {{\n    println(\"still here\");\n}}\n"));
+        let ordinary = both.spawn(timed(
+            s,
+            "fun main(console: Console) {{\n    console.println(\"still here\");\n}}\n",
+        ));
         let (spin_stopped, spin_ms) = spin.join().unwrap();
         let (ordinary_stopped, ordinary_ms) = ordinary.join().unwrap();
         assert_eq(spin_stopped, "time");

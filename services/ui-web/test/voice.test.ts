@@ -61,15 +61,15 @@ describe("voiceProblems", () => {
     expect(voiceProblems(step("Go and TypeScript do this too."))).toEqual(['names another language: "Go"', 'names another language: "TypeScript"']);
   });
 
-  it("finds a sentence of more than 30 words", () => {
-    const long = Array.from({ length: 31 }, (_, i) => `w${i}`).join(" ") + ".";
-    expect(voiceProblems(step(long))).toEqual(["has a sentence of 31 words: w0 w1 w2 w3 w4 w5 …"]);
+  it("finds a sentence of more than 45 words", () => {
+    const long = Array.from({ length: 46 }, (_, i) => `w${i}`).join(" ") + ".";
+    expect(voiceProblems(step(long))).toEqual(["has a sentence of 46 words: w0 w1 w2 w3 w4 w5 …"]);
   });
 
-  it("finds a step of more than 120 words", () => {
+  it("finds a step of more than 170 words", () => {
     const sentence = "One two three four five six seven eight nine ten.";
-    const body = Array.from({ length: 13 }, () => sentence).join("\n");
-    expect(voiceProblems(step(body))).toEqual(["has 130 words of text (at most 120)"]);
+    const body = Array.from({ length: 18 }, () => sentence).join("\n");
+    expect(voiceProblems(step(body))).toEqual(["has 180 words of text (at most 170)"]);
   });
 
   it("checks the step's own words for its error, and the quiz's feedback", () => {
@@ -106,5 +106,10 @@ describe("voiceProblems and the page's layout", () => {
   it("finds a direction, which is wrong on a phone where the code sits below the text", () => {
     expect(voiceProblems(step("On the right, `b` is a copy."))).toEqual(['points in a direction: "On the right"']);
     expect(voiceProblems(step("The code to the left of the output."))).toEqual(['points in a direction: "to the left"']);
+    expect(voiceProblems(step("The right-hand side of the screen."))).toEqual(['points in a direction: "right-hand"']);
+  });
+
+  it("reads an operator's right-hand operand or type as a term, not a direction", () => {
+    expect(voiceProblems(step("The right-hand operand is an `f64`, and so is its right-hand type."))).toEqual([]);
   });
 });

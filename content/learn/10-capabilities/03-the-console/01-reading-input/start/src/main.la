@@ -1,0 +1,10 @@
+fun main(console: Console): i32 {
+    let mut total = 0;
+    let mut lines = 0;
+    while let .Ok(.Some(line)) = console.read_line() {
+        lines += 1;
+        total += parse_i64(line.trim()).unwrap_or(0);
+    }
+    console.println("{lines} lines, total {total}");
+    0
+}

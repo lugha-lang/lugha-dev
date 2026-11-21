@@ -1,7 +1,7 @@
-fun main() {
+fun main(console: Console) {
     let score = 10;
     let score = score + 5;
-    println(score);
+    console.println(score);
     let score = "fifteen";
-    println(score);
+    console.println(score);
 }

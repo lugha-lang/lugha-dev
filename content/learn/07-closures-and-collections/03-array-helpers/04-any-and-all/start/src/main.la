@@ -1,0 +1,6 @@
+fun main(console: Console) {
+    let ages = [34, 17, 52];
+    console.println(ages.any(fun(a) = a < 18));
+    console.println(ages.all(fun(a) = a < 18));
+    console.println(ages.all(fun(a) = a > 0));
+}

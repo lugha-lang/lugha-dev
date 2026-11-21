@@ -1,0 +1,8 @@
+struct Point { x: i64, y: i64 } with Eq
+
+fun main(console: Console) {
+    let p = Point { x: 0, y: 0 };
+    if p == Point { x: 0, y: 0 } {
+        console.println("at the origin");
+    }
+}

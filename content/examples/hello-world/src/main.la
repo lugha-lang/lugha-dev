@@ -1,5 +1,5 @@
-//: Every program starts at `main`. Without a return type, it exits with code 0 when it ends.
-fun main() {
-//: `println` prints a value and a newline.
-    println("Hello, world!");
+//: Every program starts at `main`, which is given the console to print through. Without a return type, it exits with code 0 when it ends.
+fun main(console: Console) {
+//: `console.println` prints a value and a newline.
+    console.println("Hello, world!");
 }

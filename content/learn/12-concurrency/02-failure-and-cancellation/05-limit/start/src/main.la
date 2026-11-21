@@ -1,0 +1,20 @@
+import std.task;
+
+fun job(n: i64): i64 {
+    task.sleep(200);
+    n * 10
+}
+
+fun main(console: Console, clock: Clock) {
+    let start = clock.monotonic_ms();
+    let r = scope s limit 2 {
+        let a = s.spawn(job(1));
+        let b = s.spawn(job(2));
+        let c = s.spawn(job(3));
+        let d = s.spawn(job(4));
+        a.join().unwrap() + b.join().unwrap() + c.join().unwrap() + d.join().unwrap()
+    };
+    let took = clock.monotonic_ms() - start;
+    console.println(r.debug());
+    console.println(took >= 400);
+}
