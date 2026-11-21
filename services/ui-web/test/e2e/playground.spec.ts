@@ -58,3 +58,19 @@ test("an example opens in the Playground", async ({ page }) => {
   await expect(page).toHaveURL(/\/playground$/);
   await expect(page.locator(".cm-content")).toContainText("counts");
 });
+
+test("Format and Test show a compile error the way Run does", async ({ page }) => {
+  await page.goto("/playground");
+  await page.locator(".cm-content").click();
+  await page.keyboard.press("ControlOrMeta+End");
+  await page.keyboard.type("\nlet stray = 1;");
+
+  await page.getByRole("button", { name: "Format" }).click();
+  await expect(page.locator(".diagnostics")).toContainText("error[E0201]");
+  await expect(page.locator(".explain")).toBeVisible();
+  await expect(page.locator(".cm-error-line")).toHaveCount(1);
+
+  await page.getByRole("button", { name: "Test", exact: true }).click();
+  await expect(page.getByRole("tabpanel").locator(".diagnostics")).toContainText("error[E0201]");
+  await expect(page.locator(".cm-error-line")).toHaveCount(1);
+});

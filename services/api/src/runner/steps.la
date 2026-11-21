@@ -78,10 +78,16 @@ fun run_command(args: string[]): Command = timed(
 fun test_command(): Command = timed(OUTER_SECONDS - 5, 2, "lughac", [
     "test",
     "--json",
+    "--diagnostics=json",
     "--timeout",
     "{TEST_SECONDS}",
     ".",
 ]);
 
 /** Gives the command that formats the given files in place. */
-fun format_command(paths: string[]): Command = timed(COMPILE_SECONDS, 2, "lughac", ["fmt"] + paths);
+fun format_command(paths: string[]): Command = timed(
+    COMPILE_SECONDS,
+    2,
+    "lughac",
+    ["fmt", "--diagnostics=json"] + paths,
+);

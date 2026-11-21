@@ -79,7 +79,17 @@ fun an_argument_like_a_setting_reaches_the_program() {
 fun testing_runs_every_test_with_json_output() {
     assert_eq(test_command(), Command {
         cmd: "timeout",
-        args: ["--kill-after=2", "40", "lughac", "test", "--json", "--timeout", "5", "."],
+        args: [
+            "--kill-after=2",
+            "40",
+            "lughac",
+            "test",
+            "--json",
+            "--diagnostics=json",
+            "--timeout",
+            "5",
+            ".",
+        ],
     });
 }
 
@@ -87,6 +97,14 @@ fun testing_runs_every_test_with_json_output() {
 fun formatting_names_each_file() {
     assert_eq(format_command(["src/main.la", "test/main_test.la"]), Command {
         cmd: "timeout",
-        args: ["--kill-after=2", "30", "lughac", "fmt", "src/main.la", "test/main_test.la"],
+        args: [
+            "--kill-after=2",
+            "30",
+            "lughac",
+            "fmt",
+            "--diagnostics=json",
+            "src/main.la",
+            "test/main_test.la",
+        ],
     });
 }
