@@ -8,6 +8,6 @@ set -eu
 cd "$(dirname "$0")/.."
 mkdir -p generated
 docker run --rm -i --network=none --read-only --entrypoint /bin/sh \
-  "${SANDBOX_IMAGE:-lugha-sandbox:v0.18.1}" -s < scripts/explain-all.sh > generated/explanations.txt.new
+  "${SANDBOX_IMAGE:-lugha-sandbox:v0.18.2}" -s < scripts/explain-all.sh > generated/explanations.txt.new
 mv generated/explanations.txt.new generated/explanations.txt
 echo "generated/explanations.txt: $(sed -n 2p generated/explanations.txt), $(grep -c '^%%% [EW]' generated/explanations.txt) codes"

@@ -73,7 +73,7 @@ fun main(
 ): i32 {
     let image = env.get("SANDBOX_IMAGE").unwrap_or("");
     if image == "" {
-        console.eprintln("SANDBOX_IMAGE must name the sandbox image, such as lugha-sandbox:v0.18.1");
+        console.eprintln("SANDBOX_IMAGE must name the sandbox image, such as lugha-sandbox:v0.18.2");
         return 2;
     }
     let port = env.get("PORT").unwrap_or("8080");
