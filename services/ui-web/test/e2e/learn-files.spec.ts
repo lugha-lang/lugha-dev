@@ -61,3 +61,11 @@ test("a test step: Test shows each test, and only all of them passing marks it d
   await expect(page.locator(".body pre")).toContainText("2 tests: 2 passed, 0 failed");
   await expect(page.locator(current)).toHaveClass(/done/);
 });
+
+test("an error in another file marks its line in that file", async ({ page }) => {
+  await page.goto("/learn/modules-and-tests/visibility/public/");
+  await page.getByRole("button", { name: "Run" }).click();
+  await expect(page.locator(".diagnostics")).toContainText("src/shapes.la");
+  await page.getByRole("navigation", { name: "Files" }).getByRole("button", { name: "shapes.la" }).click();
+  await expect(page.locator(".cm-error-line")).toHaveCount(1);
+});
