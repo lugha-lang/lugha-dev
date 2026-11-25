@@ -223,8 +223,8 @@
     flex-wrap: wrap;
   }
   article {
-    flex: 1 1 380px;
-    max-width: 560px;
+    flex: 1 1 500px;
+    max-width: 583px;
     height: 100%;
     overflow-y: auto;
     box-sizing: border-box;
